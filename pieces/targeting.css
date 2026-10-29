@@ -1,0 +1,188 @@
+/* ============================================================================
+   piece: targeting. The strip that names the profile in force (one hero:
+   the profile name) with its context chips, the profile dropdown and the
+   Switch / New / Edit / Save as / Reset controls, plus the nine-step
+   profile wizard (overlay + sheet). Tokens only, 8px grid.
+   ========================================================================== */
+.tg-panel { min-width: 0; }
+.tg-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 400px);
+  gap: 12px 32px;
+  align-items: start;
+  padding: 14px 16px 16px;
+}
+@media (max-width: 900px) {
+  .tg-body { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+}
+
+/* --- left: kicker, hero name, summary, context chips ----------------------- */
+.tg-left { display: grid; gap: 4px; min-width: 0; align-content: start; }
+.tg-kick { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-height: 20px; }
+.tg-force {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--good);
+}
+.tg-name {
+  margin: 2px 0 0;
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.tg-summary {
+  margin: 2px 0 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 72ch;
+  overflow-wrap: anywhere;
+}
+.tg-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.tg-chip { gap: 7px; padding: 3px 9px 3px 8px; white-space: normal; line-height: 1.4; min-height: 26px; }
+.tg-chip .tg-k {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  flex: none;
+}
+.tg-chip .tg-v { color: var(--fg); overflow-wrap: anywhere; }
+.tg-chip.num .tg-v { font-variant-numeric: tabular-nums; }
+
+/* --- right: profile dropdown + Switch, then the four quiet buttons -------- */
+.tg-right { display: grid; gap: 8px; min-width: 0; align-content: start; }
+.tg-pickrow { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
+.tg-pick { flex: 1 1 180px; min-width: 0; }
+.tg-switch { flex: 0 0 auto; min-width: 96px; }
+.tg-pickhint {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: -2px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.tg-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.tg-btns .btn { flex: 1 1 auto; }
+@media (max-width: 540px) {
+  .tg-pickrow .tg-pick { flex: 1 1 100%; }
+  .tg-pickrow .tg-switch { flex: 0 1 calc(50% - 4px); }
+  .tg-btns .btn { flex: 1 1 calc(50% - 4px); }
+}
+
+/* --- empty state: no profile yet ------------------------------------------ */
+.tg-emptyrow { display: flex; gap: 14px; align-items: flex-start; }
+.tg-emptyrow > svg { flex: none; color: var(--faint); margin-top: 4px; }
+.tg-empty .tg-name { font-size: 22px; }
+.tg-empty .tg-right { align-self: center; justify-self: start; }
+@media (max-width: 540px) {
+  .tg-empty .tg-right { justify-self: stretch; }
+  .tg-empty .tg-right .btn { width: 100%; }
+}
+
+/* --- wizard: overlay + sheet ------------------------------------------------- */
+.tg-sheet { width: min(720px, 100%); }
+.tg-whead { align-items: center; }
+.tg-whead .panel-kicker { margin-left: 4px; }
+.tg-wbody { gap: 12px; }
+
+/* nine-segment progress rail; the current segment carries the accent */
+.tg-rail { display: flex; gap: 4px; }
+.tg-rail i { flex: 1 1 0; height: 3px; border-radius: 2px; background: var(--line); }
+.tg-rail i.is-done { background: color-mix(in oklab, var(--accent), transparent 50%); }
+.tg-rail i.is-cur { background: var(--accent); box-shadow: 0 0 8px var(--glow); }
+
+.tg-stephead { display: grid; gap: 2px; }
+.tg-steptitle { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.3; }
+.tg-steplead { margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
+
+.tg-fields { display: grid; gap: 14px; min-width: 0; }
+.tg-field { min-width: 0; align-content: start; }
+.tg-field .check { align-items: flex-start; }
+.tg-field .check input { margin-top: 11px; }
+.tg-field .check span { padding-top: 9px; line-height: 1.4; }
+.tg-err { margin: 0; font-size: 12.5px; font-weight: 500; line-height: 1.45; color: var(--bad); }
+.tg-field.is-error > label { color: var(--bad); }
+.tg-checks { display: flex; flex-wrap: wrap; gap: 0 20px; }
+.tg-checks .check { min-width: 0; }
+.tg-checks .check span { padding-top: 0; }
+.tg-checks .check input { margin-top: 0; }
+.tg-checks .check { align-items: center; }
+
+/* platform picker: a search box, a live count, and a scrollable grouped list */
+.tg-pcount { margin-top: 2px; }
+.tg-plist {
+  max-height: 272px;
+  overflow: auto;
+  padding: 4px 12px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-chip);
+  background: var(--panel2);
+  overscroll-behavior: contain;
+}
+.tg-pgroup {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 10px 0 4px;
+  background: var(--panel2);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.tg-pcheck { display: flex; width: 100%; gap: 10px; }
+.tg-pcheck .tg-pname { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; line-height: 1.35; }
+.tg-poff {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--faint);
+  flex: none;
+}
+.tg-pnone { margin: 8px 0; font-size: 13px; color: var(--muted); }
+
+/* discard confirmation: an inline row, never a browser dialog */
+.tg-confirm {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in oklab, var(--warn), transparent 55%);
+  border-radius: var(--r-chip);
+  background: color-mix(in oklab, var(--warn), transparent 92%);
+}
+.tg-confirm-t { font-size: 13.5px; font-weight: 600; flex: 1 1 auto; }
+
+/* Back / Cancel / Next or Save stay in reach while a long step scrolls */
+.tg-foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  margin: 2px -16px -16px;
+  padding: 10px 16px 12px;
+  background: var(--panel);
+  border-top: 1px solid var(--line);
+}
+@media (max-width: 540px) {
+  .tg-foot .btn-primary { flex: 1 1 100%; order: 9; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tg-rail i.is-cur { box-shadow: none; }
+}

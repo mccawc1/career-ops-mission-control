@@ -1,0 +1,248 @@
+/* ============================================================================
+   piece: calendar: Applied calendar. Five-week grid, day cells, day popover
+   ========================================================================== */
+.cal-panel { min-width: 0; }
+.cal-head { align-items: center; }
+.cal-stats { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+.cal-stat { gap: 4px; font-size: 12px; font-weight: 500; color: var(--muted); }
+.cal-stat strong { font-weight: 500; font-size: 12.5px; color: var(--fg); font-variant-numeric: tabular-nums; }
+.cal-stat.is-zero strong { color: var(--muted); }
+.cal-kicker { margin-left: auto; }
+.cal-body { display: grid; gap: 10px; }
+
+/* legend: the two chip colors and the today outline, each with a word */
+.cal-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.cal-legend-i { display: inline-flex; align-items: center; gap: 6px; }
+.cal-legend-today {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+/* -------- the grid ----------------------------------------------------------- */
+.cal-wrap { position: relative; min-width: 0; }
+.cal-grid { display: grid; gap: 4px; min-width: 0; }
+.cal-row { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; min-width: 0; }
+.cal-dow {
+  padding: 0 8px 2px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.cal-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  min-height: 104px;
+  padding: 8px;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-chip);
+  transition: border-color .12s ease, background .12s ease;
+}
+/* days with nothing on them stay quiet: no fill, just the hairline */
+.cal-cell.is-empty { background: transparent; border-color: color-mix(in oklab, var(--line), transparent 35%); }
+/* days still to come: a fainter date and hairline, never a dimmed cell, so
+   anything booked on them keeps full contrast */
+.cal-cell.is-future { border-style: dashed; }
+.cal-cell.is-future.is-empty { border-color: color-mix(in oklab, var(--line), transparent 50%); }
+.cal-cell.is-future .cal-date { color: var(--faint); }
+.cal-cell.has-items { cursor: pointer; }
+.cal-cell.has-items:hover { border-color: color-mix(in oklab, var(--fg), transparent 65%); }
+.cal-cell.is-open { border-color: color-mix(in oklab, var(--fg), transparent 50%); }
+.cal-cell.is-open .cal-date { color: var(--fg); }
+/* today: the one accent outline on the grid */
+.cal-cell.is-today { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.cal-cell.is-today.is-empty { background: color-mix(in oklab, var(--accent), transparent 94%); }
+
+.cal-top { display: flex; align-items: center; gap: 6px; min-height: 40px; min-width: 0; }
+.cal-date { font-size: 12px; line-height: 1; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cal-cell.is-today .cal-date { color: var(--fg); font-weight: 500; }
+.cal-mon { text-transform: uppercase; letter-spacing: .04em; }
+.cal-mon-n { display: none; }
+.cal-today-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  white-space: nowrap;
+}
+/* the count is the button: "5 v" in the top-right corner opens the day.
+   --line-strong clears 3:1 on a --panel2 cell in every theme (foundation
+   guarantees it), so the edge is the plain token. */
+.cal-caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: none;
+  margin-left: auto;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 8px 0 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-chip);
+  background: var(--panel);
+  color: var(--fg);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background .12s ease, border-color .12s ease;
+}
+.cal-caret svg { color: var(--muted); }
+.cal-caret:hover { background: color-mix(in oklab, var(--panel), var(--fg) 7%); border-color: color-mix(in oklab, var(--fg), transparent 50%); }
+.cal-caret:hover svg, .cal-caret[aria-expanded="true"] svg { color: var(--fg); }
+.cal-caret[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+/* chips: one per item, company name trimmed with an ellipsis */
+.cal-chips { display: grid; gap: 3px; min-width: 0; }
+.cal-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  min-width: 0;
+  padding: 2px 7px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.cal-chip-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-tag {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.cal-more {
+  width: 100%;
+  min-height: 40px;
+  margin-top: auto;
+  padding: 2px 8px;
+  justify-content: flex-start;
+  border-color: var(--line-strong);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.cal-more:hover { color: var(--fg); }
+.cal-dots { display: none; }
+
+/* -------- day popover --------------------------------------------------------- */
+/* The popover is a .panel parked at the end of <body>. The id selector keeps
+   its placement rules ahead of any later piece that restyles .panel. Entries
+   are buttons, so they sit on --panel2 like every other control; the chip
+   inside each one clears 4.5:1 on its tint over --panel2 in all four themes. */
+.cal-portal { position: static; }
+#cal-portal .cal-pop {
+  position: absolute;
+  z-index: 60;
+  max-width: 360px;
+  box-shadow: var(--shadow-panel-hover);
+}
+.cal-pop:focus { outline: none; }
+.cal-pop-head { align-items: center; gap: 8px; padding: 8px 8px 8px 14px; }
+.cal-pop-title { font-size: 13.5px; }
+.cal-pop-body { display: grid; gap: 4px; padding: 8px; max-height: 320px; overflow: auto; }
+.cal-entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-chip);
+  background: var(--panel2);
+  color: var(--fg);
+  text-align: left;
+  cursor: pointer;
+  transition: background .12s ease, border-color .12s ease;
+}
+.cal-entry:hover { background: color-mix(in oklab, var(--panel2), var(--fg) 7%); border-color: color-mix(in oklab, var(--fg), transparent 50%); }
+.cal-entry.is-static { cursor: default; }
+.cal-entry.is-static:hover { background: var(--panel2); border-color: var(--line-strong); }
+.cal-e-dot { margin-top: 1px; }
+.cal-e-main { display: grid; gap: 1px; flex: 1 1 auto; min-width: 0; }
+.cal-e-co { font-weight: 600; font-size: 13.5px; line-height: 1.3; overflow-wrap: anywhere; }
+.cal-e-role { font-size: 12px; line-height: 1.35; color: var(--muted); overflow-wrap: anywhere; }
+.cal-e-when { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cal-entry .chip { flex: none; }
+.cal-pop-hint { margin: 0; padding: 0 14px 10px; font-size: 12px; color: var(--muted); }
+.cal-scrim { display: none; }
+
+/* -------- footnotes and the empty state ------------------------------------- */
+.cal-foot {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.cal-empty {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  padding: 16px 14px 18px;
+  text-align: center;
+}
+.cal-empty svg { color: var(--faint); margin-bottom: 5px; }
+.cal-empty-t { font-weight: 600; font-size: 14px; }
+.cal-empty-s { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); max-width: 42ch; }
+
+/* -------- phone: 7 narrow columns, dots instead of chips ----------------------- */
+@media (max-width: 639px) {
+  .cal-kicker { margin-left: 0; flex: 1 1 100%; }
+  .cal-grid, .cal-row { gap: 3px; }
+  .cal-dow { padding: 0 0 2px; font-size: 11px; letter-spacing: .02em; text-align: center; }
+  .cal-cell { min-height: 56px; padding: 6px 3px 5px; gap: 5px; align-items: center; }
+  .cal-top { min-height: 0; justify-content: center; }
+  .cal-date { font-size: 12px; }
+  /* "Sep 6" would wrap in a 44px cell, so the month shows as "9/6" here */
+  .cal-mon { display: none; }
+  .cal-mon-n { display: inline; }
+  .cal-chips, .cal-more, .cal-caret, .cal-today-tag { display: none; }
+  .cal-dots { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 3px; max-width: 100%; }
+  .cal-dots .dot { width: 7px; height: 7px; }
+  .cal-dots-n { font-size: 11px; line-height: 1; color: var(--muted); }
+}
+
+/* -------- narrow screens: the popover becomes a bottom sheet ------------------ */
+@media (max-width: 539px) {
+  .cal-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 79;
+    background: color-mix(in oklab, var(--bg), transparent 35%);
+  }
+  #cal-portal .cal-pop.is-sheet {
+    position: fixed;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-width: none;
+    max-height: 72vh;
+    display: flex;
+    flex-direction: column;
+    z-index: 80;
+    border-radius: var(--r-panel) var(--r-panel) 0 0;
+    border-bottom: 0;
+  }
+  .cal-pop.is-sheet .cal-pop-body { max-height: none; flex: 1 1 auto; }
+  .cal-pop.is-sheet .cal-pop-hint { padding-bottom: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cal-cell, .cal-entry, .cal-caret { transition: none; }
+}

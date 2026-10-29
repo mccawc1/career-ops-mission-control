@@ -1,0 +1,157 @@
+/* ============================================================================
+   piece: activity: Mission log feed (newest first, capped + expander)
+   ========================================================================== */
+.act-panel { min-width: 0; }
+.act-panel .panel-kicker { margin-left: auto; }
+.act-body { padding-top: 10px; }
+
+.act-feed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+.act-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: start;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+}
+/* thin rail linking the icon chips into one log line */
+.act-row:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 25px;
+  top: 40px;
+  bottom: -6px;
+  width: 1px;
+  margin-left: -0.5px;
+  background: color-mix(in oklab, var(--line), transparent 15%);
+}
+
+/* round type-icon chip, colored by the one status grammar */
+.act-ic {
+  position: relative;
+  z-index: 1;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  border: 1px solid var(--line);
+  background: color-mix(in oklab, var(--fg), transparent 94%);
+  color: var(--muted);
+}
+.act-ic[data-k="good"] {
+  color: var(--good);
+  border-color: color-mix(in oklab, var(--good), transparent 68%);
+  background: color-mix(in oklab, var(--good), transparent 90%);
+}
+.act-ic[data-k="info"] {
+  color: var(--info);
+  border-color: color-mix(in oklab, var(--info), transparent 68%);
+  background: color-mix(in oklab, var(--info), transparent 90%);
+}
+.act-ic[data-k="accent"] {
+  color: var(--accent);
+  border-color: color-mix(in oklab, var(--accent), transparent 68%);
+  background: color-mix(in oklab, var(--accent), transparent 90%);
+}
+.act-ic[data-k="ivl"] {
+  color: var(--ivl);
+  border-color: color-mix(in oklab, var(--ivl), transparent 68%);
+  background: color-mix(in oklab, var(--ivl), transparent 90%);
+}
+
+.act-text {
+  margin: 0;
+  padding-top: 5px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.act-co { color: var(--accent); font-weight: 500; }
+.act-time {
+  padding-top: 7px;
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* win rows: subtle good wash, slightly bolder */
+.act-row.is-win {
+  background: color-mix(in oklab, var(--good), transparent 93%);
+  border-color: color-mix(in oklab, var(--good), transparent 80%);
+}
+.act-row.is-win .act-text { font-weight: 500; }
+
+/* "Show earlier" expander */
+.act-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  padding-top: 11px;
+  border-top: 1px dashed var(--line);
+}
+.act-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 5px 13px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-chip);
+  background: transparent;
+  color: var(--fg);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s ease, border-color .12s ease;
+}
+.act-more:hover { background: color-mix(in oklab, var(--fg), transparent 93%); }
+.act-more svg { flex: none; color: var(--accent); transition: transform .15s ease; }
+.act-more[aria-expanded="true"] svg { transform: rotate(180deg); }
+.act-foot-note { margin: 0; font-size: 12px; color: var(--faint); }
+
+/* phone: the expander is the only control in the log, so make it an easy
+   thumb target: full width, 44px tall, raised on panel2 so it reads as a
+   button, with the note centered under it */
+@media (max-width: 619px) {
+  .act-foot { flex-direction: column; align-items: stretch; gap: 7px; }
+  .act-more {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+    font-size: 13px;
+    background: var(--panel2);
+  }
+  .act-foot-note { text-align: center; }
+}
+
+/* desktop: the log shares a row with The Target. Both slots sit at the
+   top of the row (foundation main: align-items start) and each panel keeps
+   its natural height. The log used to stretch to The Target's bottom, which
+   left a long run of empty panel under the last row and read as unfinished,
+   so it no longer stretches: a short log ends right under its last row. */
+
+/* designed empty state */
+.act-empty {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  padding: 30px 14px 32px;
+  text-align: center;
+}
+.act-empty svg { color: var(--faint); margin-bottom: 5px; }
+.act-empty-t { font-weight: 600; font-size: 14px; }
+.act-empty-s { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); max-width: 42ch; }

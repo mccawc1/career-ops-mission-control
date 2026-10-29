@@ -1,0 +1,141 @@
+/* ============================================================================
+   piece: inbox. Links found by scans, not scored yet. Controls, one table,
+   an honest footer. Phone turns each table row into a stacked card.
+   ========================================================================== */
+.ib-panel { min-width: 0; }
+.ib-panel .panel-kicker { margin-left: auto; }
+.ib-body { display: grid; gap: 12px; }
+
+/* -------- controls -------------------------------------------------------- */
+.ib-controls { display: grid; gap: 10px; }
+.ib-controls-top { display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); }
+.ib-search { min-width: 0; }
+.ib-search-wrap { position: relative; display: block; }
+.ib-search-wrap svg { position: absolute; left: 11px; top: 50%; margin-top: -7px; color: var(--faint); pointer-events: none; }
+.ib-search .input { padding-left: 32px; }
+.ib-search .input::-webkit-search-cancel-button { cursor: pointer; }
+/* the sort dropdown stands in for the table headers on phones only */
+.ib-sortfield { display: none; }
+.ib-lanes { gap: 7px; }
+.ib-lane-gap { flex: 1 1 auto; }
+.ib-remote .dot { margin-right: -1px; }
+
+/* -------- table ----------------------------------------------------------- */
+.ib-wrap { max-height: none; }
+/* sort headers are real buttons (foundation: 11px mono, 36px floor). The
+   inbox gives them the full 40px tap height; 2px th padding keeps the header
+   row at 44px, and a little button padding lines the words up with the cells. */
+.ib-tbl th { padding: 2px 6px; }
+.ib-tbl th button { min-height: 40px; padding: 0 4px; white-space: nowrap; }
+.ib-tbl th.ib-th-act { padding: 4px 10px; }
+.ib-tbl th button svg { flex: none; }
+.ib-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ib-tbl td { padding: 7px 10px; }
+.ib-row:hover td { background: color-mix(in oklab, var(--fg), transparent 96%); }
+.ib-tbl .ib-td-lane { white-space: nowrap; }
+.ib-lane-wrap { display: inline-flex; align-items: center; gap: 7px; }
+.ib-conf { font-size: 12px; color: var(--muted); min-width: 3ch; text-align: right; }
+/* low confidence: a small question mark, titled, never color alone */
+.ib-q {
+  padding: 0;
+  width: 22px;
+  height: 22px;
+  justify-content: center;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: help;
+}
+.ib-co-wrap { display: inline-flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.ib-tbl .co { font-size: 13.5px; }
+.ib-flag { gap: 5px; }
+.ib-flag svg { flex: none; }
+.ib-role-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--fg);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.ib-role-link svg { flex: none; color: var(--faint); }
+.ib-role-link:hover { color: var(--accent); text-decoration: underline; }
+.ib-role-link:hover svg { color: var(--accent); }
+.ib-role-text { font-weight: 500; }
+.ib-loc-wrap { display: inline-flex; align-items: center; gap: 7px; flex-wrap: wrap; overflow-wrap: anywhere; }
+.ib-pay { color: var(--good); font-size: 13px; white-space: nowrap; }
+.ib-pay-na { font-size: 12.5px; }
+.ib-td-posted { font-size: 12.5px; white-space: nowrap; }
+.ib-td-src { font-size: 12.5px; }
+.ib-src { display: block; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ib-td-act { white-space: nowrap; }
+.ib-acts { display: inline-flex; gap: 6px; }
+.ib-acts .btn { min-width: 84px; padding-left: 12px; padding-right: 12px; }
+/* hover brightens the primary action; it was already visible */
+.ib-row:hover .ib-eval { border-color: color-mix(in oklab, var(--accent), transparent 45%); color: var(--accent); }
+.ib-row.is-dismissed td { color: var(--muted); }
+.ib-row.is-dismissed .co, .ib-row.is-dismissed .ib-role-link, .ib-row.is-dismissed .ib-pay { color: var(--muted); }
+.ib-row.is-dismissed .ib-role-link:hover { color: var(--accent); }
+
+/* -------- footer ---------------------------------------------------------- */
+.ib-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+}
+.ib-foot-line { margin: 0; font-size: 12.5px; color: var(--muted); }
+.ib-foot-line .mono { color: var(--fg); }
+
+/* -------- empty states ---------------------------------------------------- */
+.ib-empty {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  padding: 26px 14px 28px;
+  text-align: center;
+}
+.ib-empty svg { color: var(--faint); margin-bottom: 5px; }
+.ib-empty-t { font-weight: 600; font-size: 14px; }
+.ib-empty-s { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); max-width: 40ch; }
+.ib-empty .btn { margin-top: 8px; }
+
+/* -------- desktop --------------------------------------------------------- */
+@media (min-width: 700px) {
+  .ib-controls-top { grid-template-columns: minmax(240px, 420px); }
+}
+
+/* -------- phone: rows become stacked cards, no horizontal scroll ---------- */
+@media (max-width: 640px) {
+  .ib-sortfield { display: grid; }
+  .ib-lane-gap { flex: 1 1 100%; display: none; }
+  .ib-lanes .ib-remote { margin-left: 0; }
+  .ib-wrap { border: 0; border-radius: 0; background: transparent; overflow: visible; }
+  .ib-tbl, .ib-tbl tbody { display: block; }
+  .ib-tbl thead { display: none; }
+  .ib-tbl tr.ib-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px 10px;
+    padding: 12px 12px 12px;
+    margin-bottom: 8px;
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-panel);
+  }
+  .ib-tbl tr.ib-row:last-child { margin-bottom: 0; }
+  .ib-row:hover td { background: transparent; }
+  .ib-tbl td { display: block; padding: 0; border: 0; min-width: 0; min-height: 0; }
+  .ib-td-co { order: -2; grid-column: 1 / -1; }
+  .ib-td-role { order: -1; grid-column: 1 / -1; }
+  .ib-td-lane { grid-column: 1 / -1; margin: 2px 0 4px; }
+  .ib-td-loc { grid-column: 1; align-self: center; font-size: 13px; }
+  .ib-td-pay { grid-column: 2; align-self: center; text-align: right; }
+  .ib-tbl .ib-td-posted, .ib-tbl .ib-td-src, .ib-tbl .ib-conf { display: none; }
+  .ib-td-act { grid-column: 1 / -1; margin-top: 6px; white-space: normal; }
+  .ib-acts { display: flex; width: 100%; }
+  .ib-acts .btn { flex: 1 1 0; min-width: 0; }
+}

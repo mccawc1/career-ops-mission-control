@@ -1,0 +1,152 @@
+/* ============================================================================
+   piece: tracker: search, status chips, sortable table of every application
+   ========================================================================== */
+.tr-panel { min-width: 0; }
+.tr-panel .panel-kicker { margin-left: auto; }
+.tr-body { display: grid; gap: 12px; }
+
+/* -------- controls: search on the left, status chips wrapping after ------- */
+.tr-controls { display: grid; gap: 10px; min-width: 0; }
+@media (min-width: 900px) {
+  .tr-controls { grid-template-columns: minmax(200px, 224px) minmax(0, 1fr); gap: 8px 16px; align-items: end; }
+}
+.tr-search-f { cursor: text; }
+.tr-search-w { position: relative; display: block; }
+.tr-search-w svg {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  margin-top: -8px;
+  color: var(--faint);
+  pointer-events: none;
+}
+.tr-search { padding-left: 34px; }
+.tr-search::-webkit-search-cancel-button { cursor: pointer; }
+.tr-chips { min-width: 0; }
+/* a chip with nothing behind it goes quiet with token colors, never opacity,
+   so the word and the count both stay readable */
+.tr-chips .chip-btn.is-empty { color: var(--muted); }
+.tr-chips .chip-btn.is-empty .n { color: var(--faint); }
+.tr-chips .chip-btn.is-empty:hover, .tr-chips .chip-btn.is-empty:focus-visible { color: var(--fg); }
+.tr-chips .chip-btn.is-empty:hover .n, .tr-chips .chip-btn.is-empty:focus-visible .n { color: var(--muted); }
+
+/* -------- the table --------------------------------------------------------- */
+/* the scroller sits inside a frame so a right-edge fade can float over it */
+.tr-frame { position: relative; min-width: 0; }
+.tr-wrap { max-height: 70vh; }
+/* the sort button carries the cell padding, so the header cell has almost none */
+.tr-tbl th { padding: 0 4px; }
+/* sort buttons: the shared header button is 36px; here it steps up to the 40px
+   control floor so the whole header row is one tap height, text 10px from the
+   cell edge (4px cell + 6px button) */
+.tr-tbl th button { min-height: 40px; padding: 0 6px; white-space: nowrap; }
+.tr-tbl th button svg { flex: none; }
+.tr-tbl th.tr-c-links { padding: 0 10px; line-height: 40px; }
+.tr-tbl td { padding: 5px 10px; }
+.tr-tbl tbody tr:first-child td { border-top: 0; }
+.tr-tbl .select-wrap.is-compact select { min-height: 36px; }
+/* focused row lights the same way a hover does, so keyboard users see where they are */
+.tr-row:focus-within td { background: color-mix(in oklab, var(--fg), transparent 96%); }
+.tr-row.is-busy td { opacity: .7; }
+
+/* column shape: fixed-ish narrow columns, company and role share the slack */
+.tr-c-num { width: 36px; font-size: 12px; }
+.tr-c-found, .tr-c-applied { width: 72px; white-space: nowrap; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.tr-c-age { width: 52px; white-space: nowrap; font-size: 12.5px; }
+.tr-c-age.is-warn { color: var(--warn); font-weight: 600; }
+.tr-c-co { min-width: 140px; }
+.tr-c-role { min-width: 160px; font-size: 13px; overflow-wrap: anywhere; }
+.tr-c-score { width: 70px; white-space: nowrap; }
+.tr-c-status { width: 132px; }
+.tr-c-status .select-wrap { min-width: 110px; }
+.tr-c-round .select-wrap { min-width: 128px; }
+.tr-c-round { width: 150px; }
+.tr-c-links { width: 112px; }
+.tr-co { display: block; line-height: 1.3; }
+.tr-role-s { display: none; font-size: 12px; font-weight: 400; line-height: 1.3; }
+
+/* score: same band colors as the pipeline cards, "/5" small, unscored quiet */
+.tr-score { font-size: 13.5px; font-weight: 500; color: var(--muted); }
+.tr-score small { font-size: 11px; font-weight: 400; opacity: .8; }
+.tr-score.band-strong { color: var(--good); }
+.tr-score.band-good   { color: var(--accent); }
+.tr-score.band-edge   { color: var(--warn); }
+/* t-green: accent and good are the same field green, so a strong score steps
+   up to the theme's lime data accent to stay distinct from good */
+[data-cctheme="t-green"] .tr-score.band-strong { color: var(--hot); }
+.tr-score-na {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+/* links cell: posting icon link plus the always-visible Details button */
+.tr-links { display: flex; align-items: center; gap: 4px; }
+.tr-out {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-chip);
+  color: var(--muted);
+  flex: none;
+}
+a.tr-out:hover { color: var(--accent); background: color-mix(in oklab, var(--accent), transparent 90%); text-decoration: none; }
+.tr-out.is-none { color: var(--faint); opacity: .4; }
+.tr-details { min-height: 40px; padding: 5px 10px; font-size: 12.5px; }
+
+/* -------- footer and empty states ------------------------------------------- */
+.tr-foot { margin: 0; display: flex; gap: 6px 14px; flex-wrap: wrap; font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; }
+/* phone only: the wrap scrolls sideways, say so above the table */
+.tr-swipe { display: none; margin: -4px 0 0; font-size: 12px; color: var(--muted); }
+/* phone only: a fade on the right edge says "more this way" until the end */
+.tr-fade {
+  display: none;
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  bottom: 1px;
+  width: 40px;
+  pointer-events: none;
+  border-radius: 0 var(--r-panel) var(--r-panel) 0;
+  background: linear-gradient(to right, transparent, var(--panel));
+}
+.tr-empty {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  padding: 26px 14px 28px;
+  text-align: center;
+}
+.tr-empty svg { color: var(--faint); margin-bottom: 5px; }
+.tr-empty-t { font-weight: 600; font-size: 14px; }
+.tr-empty-s { margin: 0 0 4px; font-size: 12.5px; line-height: 1.5; color: var(--muted); max-width: 40ch; }
+
+/* -------- phone: fewer columns, company and role stack, table scrolls inside
+   its wrap and never the page --------------------------------------------- */
+@media (max-width: 699px) {
+  .tr-c-num, .tr-c-found, .tr-c-age, .tr-c-round, .tr-c-role { display: none; }
+  /* the Applied column stays home while no shown row has gone out */
+  .tr-tbl.is-no-applied .tr-c-applied { display: none; }
+  /* five columns need about 520px, four about 440; the wrap scrolls sideways, the page never does */
+  .tr-tbl { min-width: 520px; }
+  .tr-tbl.is-no-applied { min-width: 440px; }
+  .tr-role-s { display: block; }
+  .tr-c-co { min-width: 120px; }
+  .tr-c-score { width: 52px; }
+  .tr-c-status { width: 118px; }
+  .tr-c-links { width: 96px; }
+  .tr-tbl td { padding: 6px 8px; }
+  .tr-tbl th { padding: 0 2px; }
+  .tr-tbl th.tr-c-links { padding: 0 8px; }
+  .tr-details { padding: 5px 8px; }
+  .tr-links { gap: 0; }
+  .tr-out { width: 36px; }
+  .tr-swipe { display: block; }
+  .tr-fade { display: block; }
+  .tr-frame.is-at-end .tr-fade { display: none; }
+}

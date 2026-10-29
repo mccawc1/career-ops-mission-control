@@ -1,0 +1,303 @@
+/* ============================================================================
+   piece: pipeline: stage pills, cumulative funnel, application card grid
+   ========================================================================== */
+.pl-panel { min-width: 0; }
+.pl-panel .panel-kicker { margin-left: auto; }
+.pl-body { display: grid; gap: 14px; }
+
+/* pills left, cumulative funnel right on desktop; stacked on phone.
+   The pill stack is shorter than the funnel block, so center it against
+   the funnel instead of leaving a dead corner under it. */
+.pl-top { display: grid; gap: 14px; align-items: start; min-width: 0; }
+@media (min-width: 980px) {
+  .pl-top {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 430px);
+    gap: 14px 36px;
+    align-items: center;
+  }
+  .pl-top .pl-pills { max-width: 420px; }
+}
+
+/* -------- stage pills (filter by CURRENT status) -------------------------- */
+/* --line-strong is the control edge: it clears 3:1 on --panel in every theme,
+   so each pill reads as a button at rest, not only on hover */
+.pl-pills { display: flex; flex-wrap: wrap; gap: 7px; min-width: 0; }
+.pl-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 5px 13px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--panel2);
+  color: var(--fg);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .12s ease, border-color .12s ease;
+}
+.pl-pill:hover { background: color-mix(in oklab, var(--panel2), var(--fg) 7%); }
+.pl-pill-n {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.pl-pill.is-on {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent), transparent 88%);
+}
+.pl-pill.is-on:hover { background: color-mix(in oklab, var(--accent), transparent 80%); }
+.pl-pill.is-on .pl-pill-n { color: var(--accent); font-weight: 500; }
+/* empty stages step back with quieter tokens, never with opacity: the words
+   stay readable (muted and faint both clear 4.5:1 on --panel2) and the dot
+   goes hollow so the stage reads as "nothing here yet" */
+.pl-pill.is-empty { color: var(--muted); }
+.pl-pill.is-empty .pl-pill-n { color: var(--faint); }
+.pl-pill.is-empty.is-on { color: var(--fg); }
+.pl-pill.is-empty.is-on .pl-pill-n { color: var(--accent); }
+
+/* -------- cumulative funnel ------------------------------------------------ */
+.pl-funnel { display: grid; gap: 5px; max-width: 460px; }
+.pl-funnel-k {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 1px;
+}
+.pl-frow {
+  display: grid;
+  grid-template-columns: 116px minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 9px;
+}
+.pl-flabel { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.pl-ftrack {
+  height: 8px;
+  border-radius: 4px;
+  background: color-mix(in oklab, var(--fg), transparent 93%);
+  overflow: hidden;
+}
+.pl-fbar { display: block; height: 100%; border-radius: 4px; background: var(--accent); }
+.pl-fn {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--fg);
+}
+/* a stage nobody reached yet steps back in token color, not opacity */
+.pl-frow.is-zero .pl-flabel, .pl-frow.is-zero .pl-fn { color: var(--faint); }
+.pl-funnel-s { font-size: 12px; color: var(--faint); }
+
+/* -------- application card grid -------------------------------------------- */
+.pl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 10px;
+}
+/* the card is a clipped frame for the status rail; the summary button and
+   the open detail block carry the visible edge, so the button itself has a
+   boundary a reader (and the audit) can see */
+.pl-card {
+  position: relative;
+  min-width: 0;
+  border-radius: var(--r-panel);
+  overflow: hidden;
+  display: grid;
+}
+/* 4px status left rail, colored by the one status grammar */
+.pl-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--idle);
+}
+.pl-card[data-k="good"]::before { background: var(--good); }
+.pl-card[data-k="info"]::before { background: var(--info); }
+.pl-card[data-k="warn"]::before { background: var(--warn); }
+.pl-card[data-k="ivl"]::before  { background: var(--ivl); }
+.pl-card[data-k="bad"]::before  { background: var(--bad); }
+.pl-card.is-open { grid-column: 1 / -1; }
+
+/* whole summary is one big tap target with its own edge; it stretches to
+   the row height (so the rail never hangs below a short card) while its
+   own content packs at the top */
+.pl-sum {
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  width: 100%;
+  min-width: 0;
+  padding: 12px 13px 11px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-panel);
+  background: var(--panel2);
+  color: var(--fg);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background .12s ease, border-color .12s ease;
+}
+.pl-sum:hover {
+  background: color-mix(in oklab, var(--panel2), var(--fg) 7%);
+  border-color: color-mix(in oklab, var(--line-strong), var(--fg) 35%);
+}
+/* the card clips anything outside the button, so the focus ring sits just
+   inside the edge; browsers with :has() draw it around the whole card */
+.pl-sum:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+@supports selector(:has(a)) {
+  .pl-sum:focus-visible { outline: none; }
+  .pl-card:has(> .pl-sum:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+}
+/* open card: the summary and the detail share one accent frame */
+.pl-card.is-open .pl-sum {
+  border-color: var(--accent);
+  border-bottom: 0;
+  border-radius: var(--r-panel) var(--r-panel) 0 0;
+}
+
+.pl-toprow { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.pl-co {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+  font-size: 14.5px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.pl-score {
+  flex: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.pl-score small { font-size: 11px; font-weight: 400; color: var(--muted); }
+.pl-score.band-strong { color: var(--good); }
+.pl-score.band-good   { color: var(--accent); }
+.pl-score.band-edge   { color: var(--warn); }
+/* missing score: quiet words, never 0.0/5 */
+.pl-score.pl-score-na {
+  font-size: 11px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+/* t-green: accent and good are the same field green, so a "strong" score
+   steps up to the theme's lime data accent to stay distinct from "good" */
+[data-cctheme="t-green"] .pl-score.band-strong { color: var(--hot); }
+
+.pl-role { font-size: 12.5px; font-weight: 500; line-height: 1.35; overflow-wrap: anywhere; }
+.pl-meta {
+  margin-top: 1px;
+  font-size: 11px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.pl-chiprow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 7px; }
+/* the shared .chip-accent tint (10%) leaves accent text at 4.29:1 on a
+   --panel2 card in t-light-pro; a 5% tint clears 4.5:1 in every theme */
+.pl-pri { gap: 5px; background: color-mix(in oklab, var(--accent), transparent 95%); }
+.pl-pri svg { flex: none; }
+.pl-caret {
+  margin-left: auto;
+  display: inline-flex;
+  color: var(--faint);
+  transition: transform .15s ease;
+}
+.pl-caret.is-up { transform: rotate(180deg); }
+
+/* -------- expanded inline detail ------------------------------------------- */
+.pl-detail {
+  display: grid;
+  gap: 9px;
+  padding: 2px 14px 13px 16px;
+  background: var(--panel2);
+  border: 1px solid var(--accent);
+  border-top: 0;
+  border-radius: 0 0 var(--r-panel) var(--r-panel);
+}
+.pl-stline {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.pl-stline .dot { margin-top: 5px; }
+.pl-notes { margin: 0; font-size: 13px; line-height: 1.5; max-width: 72ch; }
+.pl-facts { display: flex; flex-wrap: wrap; gap: 6px 22px; }
+.pl-fact { display: flex; align-items: baseline; gap: 7px; min-width: 0; }
+.pl-fk {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--faint);
+  flex: none;
+}
+.pl-fv { font-size: 12px; color: var(--fg); overflow-wrap: anywhere; }
+.pl-acts { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+.pl-acts .btn { min-width: 86px; }
+.pl-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 7px 10px;
+  margin-left: auto;
+  font-size: 12.5px;
+  font-weight: 500;
+  border-radius: var(--r-chip);
+}
+.pl-open:hover { text-decoration: none; background: color-mix(in oklab, var(--accent), transparent 90%); }
+.pl-open svg { flex: none; }
+
+/* -------- closed row + empty states ---------------------------------------- */
+.pl-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0;
+  padding-top: 11px;
+  border-top: 1px dashed var(--line);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.pl-showbtn {
+  min-height: 40px;
+  padding: 4px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-chip);
+  background: transparent;
+  color: var(--fg);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s ease, border-color .12s ease;
+}
+.pl-showbtn:hover { background: color-mix(in oklab, var(--fg), transparent 93%); }
+.pl-showbtn[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.pl-empty {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  padding: 26px 14px 28px;
+  text-align: center;
+}
+.pl-empty svg { color: var(--faint); margin-bottom: 5px; }
+.pl-empty-t { font-weight: 600; font-size: 14px; }
+.pl-empty-s { margin: 0 0 4px; font-size: 12.5px; line-height: 1.5; color: var(--muted); max-width: 40ch; }

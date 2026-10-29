@@ -1,0 +1,70 @@
+
+<script>
+/* ===== piece: prep-now ===== */
+/* piece: prep-now. The "Reconcile current applications" button in the header (Chris, Oct 16):
+   fires the apply-tap check (a scheduled task on this account) through
+   the viewer's Claude Code Remote connector, so every job Chris tapped
+   Apply on is prepped right away instead of at the next scheduled slot.
+   Reads CMC.state, writes only through CMC.act.*. Nothing here sends an
+   application anywhere. */
+(function () {
+  'use strict';
+  var CMC = window.CMC;
+  var btn = document.getElementById('prepNowBtn');
+  if (!CMC || !btn) return;
+  var TRIGGER = 'trig_01EU6tetCPyS83Vc438ueCu8';
+  var SERVER = 'Claude Code Remote';
+  var SLOTS = '10:51 AM, 2:51 PM and 6:51 PM Central';
+  var busy = false;
+  var label = btn.querySelector('.add-label');
+  var labelS = btn.querySelector('.add-label-s');
+  function setText(t, short) { if (label) label.textContent = t; if (labelS) labelS.textContent = short || t; }
+  function say(msg) { if (typeof CMC.toast === 'function') CMC.toast(msg); else console.log(msg); }
+  function waiting() {
+    var q = (CMC.state && CMC.state.queue) || [];
+    return q.filter(function (d) { return d && (d.state === 'requested' || d.state === 'prepping'); });
+  }
+  function useMcp() {
+    var c = window.claude;
+    if (!c || typeof c.use !== 'function') return Promise.resolve(null);
+    try { return Promise.resolve(c.use('mcp')).catch(function () { return null; }); } catch (e) { return Promise.resolve(null); }
+  }
+  /* each error code has its own fix; never one generic banner */
+  function explain(e) {
+    var code = e && e.code ? String(e.code) : 'unknown';
+    switch (code) {
+      case 'not_in_manifest': case 'not_granted': case 'consent_required':
+        return 'The page was not allowed to start a run. Tap Reconcile current applications again and choose Allow, or tell Claude in chat. The scheduled check still runs at ' + SLOTS + '.';
+      case 'server_not_connected': case 'needs_reauth': case 'selection_required': case 'capability_disabled': case 'capability_removed':
+        return 'This view cannot reach the Claude Code Remote connector. Tell Claude in chat to prep now. The scheduled check still runs at ' + SLOTS + '.';
+      case 'tool_error':
+        return 'Claude could not start the run: ' + (e.message || 'no details') + '. The scheduled check still runs at ' + SLOTS + '.';
+      case 'server_unavailable': case 'upstream_error':
+        return 'The run may or may not have started (the connector did not answer). Wait a few minutes and refresh before tapping again. The scheduled check still runs at ' + SLOTS + '.';
+      default:
+        return 'Could not start the run (' + code + '). Tell Claude in chat, or wait for the scheduled check at ' + SLOTS + '.';
+    }
+  }
+  function reset() { busy = false; btn.disabled = false; setText('Reconcile current applications', 'Reconcile'); }
+  function onClick() {
+    if (busy) return;
+    var w = waiting();
+    if (!w.length) { say('Nothing to reconcile. Every job you tapped Apply on is already prepped. Tap Apply on a job first.'); return; }
+    busy = true; btn.disabled = true; setText('Starting...', '...');
+    var names = w.map(function (d) { return d.company || 'a job'; }).join(', ');
+    useMcp().then(function (mcp) {
+      if (!mcp || typeof mcp.callTool !== 'function') {
+        say('This view cannot start a run. Tell Claude in chat to prep now, or wait for the check at ' + SLOTS + '.');
+        return;
+      }
+      var note = 'Chris pressed Reconcile current applications on the dashboard. Waiting: ' + names + '.';
+      return mcp.callTool(SERVER, 'fire_trigger', { trigger_id: TRIGGER, text: note }).then(function () {
+        say('Reconciling. Claude is prepping ' + names + '. Give it 10 to 20 minutes, then refresh the page.');
+        try { CMC.act.addActivity('Chris pressed Reconcile current applications: ' + names + ' sent to Claude to prep.', 'queue'); } catch (e2) { /* the run matters more than the note */ }
+      }, function (e) { say(explain(e)); });
+    }).then(reset, reset);
+  }
+  btn.addEventListener('click', onClick);
+})();
+</script>
+</body></html>

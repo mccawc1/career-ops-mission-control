@@ -1,0 +1,400 @@
+/* ============================================================================
+   piece: platforms, shown as "Intel sources": count chips, a by-method bar
+   list, and a fleet-status list of every board and feed Claude pulls from.
+   Foundation covers the shared parts: .chip-btn is 40px tall with the
+   control edge, [hidden] is display none everywhere, :focus-visible draws
+   the ring, .chip and .dot carry the status grammar. Only the piece's own
+   layout and its disclosure look live here.
+   ========================================================================== */
+.pf-panel { min-width: 0; }
+.pf-panel .panel-kicker { margin-left: auto; }
+.pf-body { display: grid; gap: 16px; }
+
+/* -------- top block: summary left, by-method bars right on desktop -------- */
+.pf-top { display: grid; gap: 16px; align-items: start; min-width: 0; }
+@media (min-width: 980px) {
+  .pf-top {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 500px);
+    gap: 16px 40px;
+  }
+}
+
+/* -------- summary: three count chips, the Show all toggle, one note ------- */
+.pf-sum { display: grid; gap: 8px; min-width: 0; align-content: start; }
+.pf-sum-row { display: flex; align-items: center; gap: 8px 16px; flex-wrap: wrap; min-width: 0; }
+.pf-chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pf-chip {
+  min-height: 32px;
+  padding: 3px 12px 3px 10px;
+  gap: 8px;
+  font-size: 12px;
+}
+.pf-chip-n {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+/* the producing chip is the one number that means coverage, so it carries
+   the good state; the other two stay quiet */
+.pf-chip.chip-good .pf-chip-n { color: var(--good); }
+.pf-chip.chip-idle { color: var(--muted); }
+
+.pf-showall { margin-left: auto; }
+/* the shared chip-btn has no disabled look of its own */
+.pf-showall:disabled { opacity: .55; cursor: default; }
+.pf-showall:disabled:hover { background: var(--panel2); }
+
+.pf-sumnote {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 64ch;
+}
+
+/* three facts with context: last scan, needs a look, first scan pending */
+.pf-facts { display: grid; gap: 6px; margin-top: 4px; }
+.pf-fact { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.pf-fk {
+  flex: none;
+  width: 136px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.pf-fv {
+  min-width: 0;
+  font-size: 13px;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.pf-fv.is-warn { color: var(--warn); font-weight: 500; }
+
+/* -------- by method: sorted bar list, length encodes count ---------------- */
+.pf-methods { display: grid; gap: 6px; min-width: 0; align-content: start; }
+.pf-methods-k {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.pf-mlist { display: grid; gap: 5px; }
+.pf-mrow {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr) 32px;
+  align-items: center;
+  gap: 8px;
+  min-height: 16px;
+}
+.pf-mlabel {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pf-mlabel.mono { font-size: 11px; letter-spacing: .05em; }
+.pf-mtrack {
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: color-mix(in oklab, var(--fg), transparent 93%);
+  overflow: hidden;
+}
+.pf-mbar { display: block; height: 100%; border-radius: 4px; background: var(--accent); }
+.pf-mn {
+  font-size: 12px;
+  text-align: right;
+  color: var(--fg);
+}
+/* a method with no boards yet stays readable: faint text and a quieter
+   track, never a faded row (opacity would sink the label below 4.5:1) */
+.pf-mrow.is-zero .pf-mlabel,
+.pf-mrow.is-zero .pf-mn { color: var(--faint); }
+.pf-mrow.is-zero .pf-mtrack { background: color-mix(in oklab, var(--fg), transparent 96%); }
+
+/* the legend sits behind one small toggle so the bar list stays short;
+   the same rows also carry their meaning as a hover title. The button is
+   the shared chip-btn; the open look mirrors its pressed look because
+   foundation keys that on aria-pressed and this is a disclosure */
+.pf-legend-row { display: flex; align-items: center; margin-top: 4px; }
+.pf-legend-btn[aria-expanded="true"] {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent), transparent 88%);
+}
+.pf-legend-btn .pf-caret { color: var(--muted); }
+.pf-legend {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 4px 12px;
+  margin: 4px 0 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--panel2);
+}
+.pf-legend dt {
+  font-size: 12px;
+  color: var(--fg);
+  white-space: nowrap;
+}
+.pf-legend dt.mono { font-size: 11px; letter-spacing: .05em; }
+.pf-legend dd {
+  margin: 0;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+/* -------- groups ------------------------------------------------------------ */
+/* the header row is the control, so it carries the card's edge itself
+   (the control edge token, like every button); the open list hangs
+   under it inside the same frame */
+.pf-groups { display: grid; gap: 8px; }
+.pf-group {
+  border-radius: var(--r-panel);
+  background: var(--panel);
+  min-width: 0;
+}
+.pf-ghead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-panel);
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+  text-align: left;
+  transition: background .12s ease;
+}
+.pf-ghead:hover { background: color-mix(in oklab, var(--fg), transparent 95%); }
+.pf-group.is-open .pf-ghead {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  background: var(--panel2);
+}
+.pf-gname {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+  font-size: 13.5px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.pf-group.is-hold .pf-gname { color: var(--muted); }
+.pf-gcount {
+  flex: none;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.pf-caret {
+  flex: none;
+  display: inline-flex;
+  color: var(--faint);
+  transition: transform .15s ease;
+}
+.pf-caret.is-up { transform: rotate(180deg); }
+
+/* -------- rows -------------------------------------------------------------- */
+.pf-list {
+  list-style: none;
+  margin: 0;
+  padding: 2px 12px 6px;
+  border: 1px solid var(--line-strong);
+  border-top: 0;
+  border-radius: 0 0 var(--r-panel) var(--r-panel);
+}
+.pf-row {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto 40px;
+  align-items: center;
+  gap: 2px 10px;
+  min-height: 44px;
+  padding: 4px 0;
+  border-top: 1px solid color-mix(in oklab, var(--line), transparent 45%);
+}
+.pf-row:first-child { border-top: 0; }
+/* rows without a link keep the same 4-column template; the empty 40px track
+   acts as a spacer so the scan column lines up across every group */
+.pf-row.is-off .pf-name,
+.pf-row.is-off .pf-kind,
+.pf-row.is-off .pf-method,
+.pf-row.is-off .pf-note { color: var(--muted); }
+/* a note-only hint when every row in a group is tucked away */
+.pf-ghint {
+  padding: 10px 0 8px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.pf-main {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+.pf-name {
+  flex: 0 1 auto;
+  min-width: 0;
+  font-weight: 600;
+  font-size: 13.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* the small tags after a name: the kind tag is the shared chip, quieter
+   (regular weight, muted); method and Off share its shape in mono */
+.pf-kind,
+.pf-method,
+.pf-off {
+  flex: none;
+  padding: 0 8px;
+  line-height: 1.6;
+  font-weight: 400;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.pf-method,
+.pf-off {
+  border: 1px solid var(--line);
+  border-radius: var(--r-chip);
+  background: transparent;
+  font-size: 11px;
+  letter-spacing: .06em;
+  line-height: 1.75;
+}
+.pf-off {
+  border-style: dashed;
+  color: var(--faint);
+}
+.pf-note {
+  flex: 1 1 60px;
+  min-width: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* search-feed rows: the note IS the payload (what the feed scans), so it gets
+   its own full line and may wrap to two lines instead of truncating */
+.pf-row.is-feed .pf-main { flex-wrap: wrap; row-gap: 2px; }
+.pf-row.is-feed > .dot { align-self: start; margin-top: 5px; }
+.pf-row.is-feed .pf-note {
+  flex: 1 1 100%;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.45;
+}
+.pf-scan {
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.pf-alert { color: var(--warn); font-weight: 500; }
+.pf-noscan { color: var(--faint); }
+
+.pf-link {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: end;
+  border-radius: var(--r-chip);
+  color: var(--accent);
+  transition: background .12s ease;
+}
+.pf-link:hover {
+  text-decoration: none;
+  background: color-mix(in oklab, var(--accent), transparent 88%);
+}
+.pf-link svg { flex: none; }
+
+/* -------- footer line ---------------------------------------------------------- */
+.pf-foot {
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* -------- empty state -------------------------------------------------------- */
+.pf-empty {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  padding: 26px 14px 28px;
+  text-align: center;
+}
+.pf-empty svg { color: var(--faint); margin-bottom: 5px; }
+.pf-empty-t { font-weight: 600; font-size: 14px; }
+.pf-empty-s {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 44ch;
+}
+
+/* -------- phone -------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .pf-sum-row { gap: 8px 12px; }
+  .pf-showall { margin-left: 0; }
+  .pf-mrow { grid-template-columns: 104px minmax(0, 1fr) 28px; }
+  .pf-row {
+    grid-template-columns: 8px minmax(0, 1fr) 40px;
+    padding: 8px 0;
+    row-gap: 3px;
+  }
+  .pf-row.no-link { grid-template-columns: 8px minmax(0, 1fr); }
+  .pf-row > .dot { grid-column: 1; grid-row: 1; align-self: start; margin-top: 6px; }
+  .pf-main {
+    grid-column: 2;
+    grid-row: 1;
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: 4px;
+  }
+  .pf-name {
+    white-space: normal;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    line-height: 1.3;
+  }
+  /* no hover tooltips on a phone, so every note wraps and shows in full */
+  .pf-note,
+  .pf-row.is-feed .pf-note {
+    flex: 1 1 100%;
+    display: block;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    -webkit-line-clamp: none;
+    line-height: 1.45;
+  }
+  .pf-scan { grid-column: 2; grid-row: 2; justify-self: start; }
+  .pf-link { grid-column: 3; grid-row: 1 / span 2; align-self: center; }
+  .pf-ghead { padding: 8px 12px; }
+  .pf-list { padding: 2px 12px 6px; }
+}

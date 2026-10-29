@@ -1,0 +1,232 @@
+/* ============================================================================
+   piece: needs-you. Waiting on Chris lane + Interview ops lane
+   ========================================================================== */
+/* side by side from 920px up, the two lanes share one height so the
+   shorter one never leaves a hole for the neural field under its last row */
+.ny-wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; align-items: stretch; }
+@media (min-width: 920px) {
+  .ny-wrap { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
+.ny-lane { min-width: 0; display: flex; flex-direction: column; }
+.ny-lane .panel-kicker { margin-left: auto; }
+.ny-lane .panel-body { flex: 1 1 auto; display: grid; gap: 14px; align-content: start; }
+/* interview ops: strip, then the list or empty state takes the slack, then
+   the add button or form pinned at the foot */
+.ny-ivops .panel-body { grid-template-rows: auto minmax(0, 1fr) auto; }
+.ny-count { gap: 0; }
+
+/* -------- Waiting on Chris: groups and task rows -------------------------- */
+.ny-group { display: grid; gap: 6px; min-width: 0; }
+.ny-glabel {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.ny-gn { font-size: 11px; letter-spacing: 0; color: var(--muted); }
+
+.ny-tlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ny-task {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px 10px;
+  align-items: start;
+  padding: 10px 12px 10px;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  min-width: 0;
+}
+/* the lanes are wide enough from 1100px up to carry the buttons beside the
+   text; below that they sit under it so the title keeps its full width */
+@media (min-width: 1100px) {
+  .ny-task { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .ny-task .ny-tacts { grid-column: 3; grid-row: 1; margin-top: 0; align-self: start; }
+}
+.ny-tdot { margin-top: 7px; }
+.ny-tmain { display: grid; gap: 2px; min-width: 0; }
+.ny-ttitle { font-weight: 600; font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
+.ny-tdetail {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.ny-tdetail.is-open { display: block; -webkit-line-clamp: unset; }
+/* More / Less: the same chip toggle as Show them and Finished, so a
+   clamped detail reads as something you can open */
+.ny-more { justify-self: start; margin-top: 4px; gap: 5px; }
+.ny-more svg { color: var(--muted); transition: transform .15s ease; }
+.ny-more[aria-expanded="true"] svg { transform: rotate(180deg); }
+.ny-tacts { grid-column: 2; display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.ny-tacts .btn { min-width: 64px; padding: 7px 12px; font-size: 13px; }
+.ny-tacts .btn svg { flex: none; }
+.ny-done svg { color: var(--good); }
+.ny-open { font-weight: 600; }
+.ny-open:hover { text-decoration: none; }
+
+/* 25 sign-ups fold into one row until Chris asks for them */
+.ny-signup-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-panel);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.ny-signup-t { flex: 1 1 180px; min-width: 0; }
+.ny-signup-btn { margin-left: auto; gap: 5px; }
+.ny-signup-btn svg { color: var(--muted); transition: transform .15s ease; }
+.ny-signup-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+/* finished tasks: collapsed count at the bottom, Undo on each row */
+.ny-fin { display: grid; gap: 8px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.ny-fin-btn { justify-self: start; gap: 6px; }
+.ny-fin-caret { display: inline-flex; color: var(--muted); transition: transform .15s ease; }
+.ny-fin-caret.is-up { transform: rotate(180deg); }
+.ny-frow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-height: 44px;
+  padding: 4px 12px;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+}
+.ny-ftitle { flex: 1 1 160px; min-width: 0; font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.ny-fago { font-size: 12px; color: var(--faint); white-space: nowrap; }
+.ny-undo { margin-left: auto; padding: 7px 12px; font-size: 13px; }
+
+/* -------- Interview ops: the 14-day strip ---------------------------------- */
+.ny-stripwrap { display: grid; gap: 6px; }
+.ny-strip-k {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.ny-strip-leg { display: inline-flex; align-items: center; gap: 6px; letter-spacing: .04em; }
+/* two rows of seven on a phone, one row of fourteen from 600px up */
+.ny-strip { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+@media (min-width: 600px) {
+  .ny-strip { grid-template-columns: repeat(14, minmax(0, 1fr)); }
+}
+.ny-cell {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  padding: 6px 2px 7px;
+  min-width: 0;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-chip);
+}
+.ny-cell-w { font-family: var(--mono); font-size: 11px; letter-spacing: .02em; color: var(--faint); }
+.ny-cell-d { font-size: 13px; font-weight: 500; line-height: 1.2; color: var(--muted); }
+.ny-cell-no { width: 8px; height: 8px; border-radius: 50%; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--line), var(--fg) 10%); }
+.ny-cell.has-ev {
+  border-color: color-mix(in oklab, var(--ivl), transparent 45%);
+  background: color-mix(in oklab, var(--ivl), transparent 88%);
+}
+.ny-cell.has-ev .ny-cell-d { color: var(--ivl); font-weight: 700; }
+.ny-cell.has-ev .ny-cell-w { color: var(--ivl); }
+/* today is outlined in the text color, so it stays "today" in every theme */
+.ny-cell.is-today { box-shadow: inset 0 0 0 1.5px var(--fg); }
+.ny-cell.is-today .ny-cell-d { color: var(--fg); }
+
+/* -------- Interview ops: event cards --------------------------------------- */
+.ny-ivlist { display: grid; gap: 10px; align-content: start; }
+.ny-iv {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  padding: 12px 13px 12px 16px;
+  min-width: 0;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  overflow: hidden;
+}
+/* 4px left rail: interview purple, idle once the date has passed */
+.ny-iv::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--ivl); }
+.ny-iv[data-k="idle"]::before { background: var(--idle); }
+.ny-iv.is-editing { border-color: color-mix(in oklab, var(--accent), transparent 55%); }
+.ny-ivhead { display: flex; align-items: baseline; gap: 4px 10px; flex-wrap: wrap; min-width: 0; }
+.ny-ivco { font-weight: 600; font-size: 14.5px; line-height: 1.3; overflow-wrap: anywhere; }
+.ny-ivrole { font-size: 12.5px; color: var(--muted); min-width: 0; overflow-wrap: anywhere; }
+.ny-ivwhen { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+.ny-ivdate { font-size: 13px; font-weight: 500; color: var(--fg); }
+.ny-ivdate.is-tbd { color: var(--muted); font-weight: 400; }
+.ny-ivrel { font-size: 12px; color: var(--muted); }
+.ny-iv.is-past .ny-ivdate { color: var(--muted); }
+.ny-ivchips { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ny-ivnotes { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; }
+.ny-ivacts { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+.ny-ivacts .btn { min-width: 64px; padding: 7px 12px; font-size: 13px; }
+
+/* -------- forms (add and edit) --------------------------------------------- */
+.ny-addrow { display: flex; }
+.ny-add-btn { gap: 7px; }
+.ny-add-btn svg { flex: none; }
+.ny-form {
+  display: grid;
+  gap: 12px;
+  padding: 12px 13px 13px;
+  background: var(--panel2);
+  border: 1px solid color-mix(in oklab, var(--accent), transparent 55%);
+  border-radius: var(--r-panel);
+  min-width: 0;
+}
+.ny-editform { padding: 10px 0 0; background: transparent; border: 0; border-top: 1px dashed var(--line); border-radius: 0; }
+.ny-form-k {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.ny-form .form-row { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.ny-form .field-hint { grid-column: 1 / -1; }
+.ny-form-hint { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--faint); }
+.ny-err { margin: 0; font-size: 12.5px; font-weight: 600; color: var(--bad); }
+.ny-confirm { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.ny-ed-del { color: var(--muted); }
+.ny-ed-del:hover { color: var(--bad); border-color: color-mix(in oklab, var(--bad), transparent 55%); }
+/* native date and time pickers: keep the icon readable on dark themes */
+.ny-form input[type="date"], .ny-form input[type="time"] { min-width: 0; font-variant-numeric: tabular-nums; }
+
+/* -------- empty states ----------------------------------------------------- */
+.ny-empty {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 5px;
+  padding: 26px 14px 28px;
+  text-align: center;
+}
+.ny-empty svg { color: var(--faint); margin-bottom: 5px; }
+.ny-empty-t { font-weight: 600; font-size: 14px; }
+.ny-empty-s { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); max-width: 36ch; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ny-signup-btn svg, .ny-fin-caret, .ny-more svg { transition: none; }
+}

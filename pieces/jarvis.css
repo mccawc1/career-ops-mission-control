@@ -1,0 +1,103 @@
+/* piece: jarvis. Static HUD chrome plus the keyboard cheat sheet.
+   The neural field itself is #jarvisCanvas, positioned by foundation.css.
+   Nothing in this file moves: no sweeps, no glitch, no typing effects. */
+
+/* --- corner ticks on panels, dark themes only ---------------------------
+   two inset L-shaped ticks (top left, bottom right), 1px, in the control
+   boundary tone so they read as drawn chrome, not as a border glitch.
+   Scoped to panels that live inside a panel slot: a popover or a sheet that
+   borrows the .panel look but is mounted on body keeps its own positioning. */
+.panel-slot .panel { position: relative; }
+.panel-slot .panel::before, .panel-slot .panel::after {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  pointer-events: none;
+  display: none;
+  border: 0 solid color-mix(in oklab, var(--line-strong, var(--line)), transparent 30%);
+}
+.panel-slot .panel::before { top: 6px; left: 6px; border-top-width: 1px; border-left-width: 1px; }
+.panel-slot .panel::after { right: 6px; bottom: 6px; border-right-width: 1px; border-bottom-width: 1px; }
+/* :where() keeps these at the same weight as the exclusions below, so the
+   exclusions win by coming later in the file */
+:root:where([data-cctheme="t-dark-ops"], [data-cctheme="t-bold"], [data-cctheme="t-green"]) .panel-slot .panel::before,
+:root:where([data-cctheme="t-dark-ops"], [data-cctheme="t-bold"], [data-cctheme="t-green"]) .panel-slot .panel::after,
+:root:where([data-theme="dark"]:not([data-cctheme])) .panel-slot .panel::before,
+:root:where([data-theme="dark"]:not([data-cctheme])) .panel-slot .panel::after { display: block; }
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"]):not([data-cctheme])) .panel-slot .panel::before,
+  :root:where(:not([data-theme="light"]):not([data-cctheme])) .panel-slot .panel::after { display: block; }
+}
+/* the ticks are chrome, not content: never on a sheet, the drawer, a
+   popover, or a panel that is nested inside another panel */
+.panel-slot .sheet .panel::before, .panel-slot .sheet .panel::after,
+.panel-slot .drawer-aside .panel::before, .panel-slot .drawer-aside .panel::after,
+.panel-slot .panel .panel::before, .panel-slot .panel .panel::after,
+.panel-slot .cal-pop::before, .panel-slot .cal-pop::after { display: none; }
+
+/* --- the neural background button in the command bar --------------------
+   foundation.css sizes and colors .jarvis-btn (44px round, 40px on phones).
+   Only the glyph's hover motion lives here, and it is off under reduced
+   motion. */
+.jarvis-btn svg { transition: transform .15s ease; }
+.jarvis-btn:hover svg { transform: scale(1.12); }
+@media (prefers-reduced-motion: reduce) { .jarvis-btn svg { transition: none; } .jarvis-btn:hover svg { transform: none; } }
+
+/* --- a thin hairline along the top edge of the command bar -------------- */
+.cmdbar::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent 0, var(--line-strong, var(--line)) 14%, var(--line-strong, var(--line)) 86%, transparent 100%);
+}
+
+/* --- keyboard cheat sheet ------------------------------------------------ */
+.jv-sheet { width: min(740px, 100%); }
+.jv-note { margin: 0; font-size: 12.5px; color: var(--muted); }
+.jv-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 28px; }
+@media (max-width: 540px) { .jv-cols { grid-template-columns: 1fr; } }
+.jv-col-title {
+  margin: 0 0 6px;
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.jv-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.jv-list li {
+  display: grid;
+  grid-template-columns: 108px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-height: 32px;
+  font-size: 13.5px;
+  border-top: 1px solid color-mix(in oklab, var(--line), transparent 40%);
+}
+.jv-list li:first-child { border-top: 0; }
+.jv-keys { display: inline-flex; align-items: center; gap: 6px; }
+.jv-or { font-size: 12px; color: var(--faint); }
+.jv-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 24px;
+  padding: 0 7px;
+  border: 1px solid var(--line-strong, var(--line));
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  background: var(--panel2);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg);
+  white-space: nowrap;
+}
+.jv-what { min-width: 0; color: var(--fg); }

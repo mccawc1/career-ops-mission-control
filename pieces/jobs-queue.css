@@ -1,0 +1,338 @@
+/* ============================================================================
+   piece: jobs-queue, the Action center: New matches lane + Apply queue lane
+   ========================================================================== */
+.jq-wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (min-width: 920px) {
+  .jq-wrap { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
+.jq-lane { min-width: 0; }
+.jq-lane .panel-kicker { margin-left: auto; }
+.jq-lane .panel-body { display: grid; gap: 12px; }
+
+/* trust line under the Apply queue head */
+.jq-trust {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.jq-trust svg { flex: none; color: var(--accent); margin-top: 1px; }
+
+/* -------- New matches: match cards --------------------------------------- */
+.jq-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 13px;
+  padding: 13px 14px;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  min-width: 0;
+}
+.jq-scorecol { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.jq-score {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1px;
+  padding: 6px 8px;
+  border-radius: var(--r-chip);
+  border: 1px solid var(--line);
+  background: var(--panel);
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--muted);
+}
+.jq-score small { font-size: 11px; font-weight: 400; opacity: .8; }
+/* no score yet (Chris pasted the link himself): quiet word chip, no number */
+.jq-score.jq-score-na {
+  max-width: 80px;
+  font-size: 11px;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  line-height: 1.35;
+  text-align: center;
+  white-space: normal;
+}
+.jq-score.band-strong { color: var(--good); border-color: color-mix(in oklab, var(--good), transparent 55%); background: color-mix(in oklab, var(--good), transparent 90%); }
+/* good band: the shared 10% accent tint leaves accent text at 4.29:1 on a
+   --panel2 card in t-light-pro; a 5% tint clears 4.5:1 in every theme
+   (same fix as the pipeline's Priority chip) */
+.jq-score.band-good   { color: var(--accent); border-color: color-mix(in oklab, var(--accent), transparent 55%); background: color-mix(in oklab, var(--accent), transparent 95%); }
+.jq-score.band-edge   { color: var(--warn); border-color: color-mix(in oklab, var(--warn), transparent 55%); background: color-mix(in oklab, var(--warn), transparent 90%); }
+/* t-green: accent and good are the same field green. A strong score steps
+   up to the theme's lime data accent so "strong fit" and "good fit" never
+   share one green and each keeps its own meaning. */
+[data-cctheme="t-green"] .jq-score.band-strong {
+  color: var(--hot);
+  border-color: color-mix(in oklab, var(--hot), transparent 55%);
+  background: color-mix(in oklab, var(--hot), transparent 90%);
+}
+.jq-band {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--faint);
+  text-align: center;
+}
+
+.jq-main { display: grid; gap: 3px; min-width: 0; align-content: start; }
+.jq-corow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
+.jq-co { font-weight: 600; font-size: 15px; line-height: 1.3; overflow-wrap: anywhere; }
+/* same 5% tint for the Priority chip, for the same t-light-pro reason */
+.jq-pri { gap: 5px; background: color-mix(in oklab, var(--accent), transparent 95%); }
+.jq-pri svg { flex: none; }
+.jq-role { font-size: 13.5px; font-weight: 500; line-height: 1.35; overflow-wrap: anywhere; }
+.jq-meta {
+  margin-top: 1px;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.jq-why {
+  margin: 3px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.jq-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 9px; }
+.jq-actions .btn { min-width: 72px; }
+/* phones: the three buttons take the full card width under the score so
+   Apply, Pass and Details stay on one line */
+@media (max-width: 480px) {
+  .jq-actions { grid-column: 1 / -1; margin-top: 4px; }
+  .jq-actions .btn { flex: 1 1 0; min-width: 0; }
+}
+
+/* quiet footer line: job links waiting for a score */
+.jq-foot {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  padding-top: 11px;
+  border-top: 1px dashed var(--line);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* -------- Apply queue: queue cards --------------------------------------- */
+.jq-q {
+  display: grid;
+  gap: 10px;
+  padding: 13px 14px 14px;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  min-width: 0;
+}
+/* header: the title block (company, role, chip) wraps inside its own
+   column while the time stamp keeps its own column on the company line,
+   so a long role on a phone never pushes the stamp onto a line of its own
+   and the cards line up */
+.jq-qhead { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 6px 10px; min-width: 0; }
+.jq-qtitle { display: flex; align-items: baseline; gap: 6px 10px; flex-wrap: wrap; min-width: 0; }
+.jq-qco { font-weight: 600; font-size: 14.5px; overflow-wrap: anywhere; }
+.jq-qrole { font-size: 12.5px; color: var(--muted); min-width: 0; overflow-wrap: anywhere; }
+/* ready: the shared .chip.chip-warn, word plus dot. Foundation owns the
+   chip's text color, gap and size (it clears 4.5:1 on its tint over
+   --panel2 in every theme), so there is no local override here. */
+.jq-qago {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+/* 5-step state timeline: connected dots, current step lit */
+.jq-steps { display: flex; margin: 1px 0 0; padding: 0; list-style: none; }
+.jq-step {
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.jq-step::before {
+  content: "";
+  position: absolute;
+  top: 5px;
+  height: 2px;
+  left: calc(-50% + 9px);
+  right: calc(50% + 9px);
+  border-radius: 1px;
+  background: var(--line);
+}
+.jq-step:first-child::before { display: none; }
+.jq-step.is-done::before,
+.jq-step.is-current::before { background: color-mix(in oklab, var(--accent), transparent 40%); }
+
+.jq-dot { width: 12px; height: 12px; border-radius: 50%; position: relative; z-index: 1; box-sizing: border-box; }
+.jq-step.is-todo .jq-dot {
+  background: var(--panel2);
+  border: 2px solid color-mix(in oklab, var(--faint), transparent 30%);
+}
+.jq-step.is-done .jq-dot { background: color-mix(in oklab, var(--accent), transparent 25%); }
+
+.jq-steps[data-cur="requested"] { --jq-cur: var(--idle); }
+.jq-steps[data-cur="prepping"]  { --jq-cur: var(--info); }
+.jq-steps[data-cur="ready"]     { --jq-cur: var(--warn); }
+.jq-steps[data-cur="approved"],
+.jq-steps[data-cur="submitted"] { --jq-cur: var(--good); }
+.jq-step.is-current .jq-dot {
+  background: var(--jq-cur, var(--accent));
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--jq-cur, var(--accent)), transparent 75%);
+}
+/* pulse ONLY while Claude is genuinely working (prepping) */
+.jq-steps[data-cur="prepping"] .is-current .jq-dot { animation: cmc-pulse 1.8s ease-in-out infinite; }
+/* ready = the loudest item on the page: the card glows, the dot glows too */
+.jq-steps[data-cur="ready"] .is-current .jq-dot {
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--warn), transparent 72%), 0 0 12px var(--glow);
+}
+/* t-green: the ready dot's halo stays in the amber warn family too, matching
+   the card border override in foundation.css (one signal, one hue) */
+:root[data-cctheme="t-green"] .jq-steps[data-cur="ready"] .is-current .jq-dot {
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--warn), transparent 72%), 0 0 12px color-mix(in srgb, var(--warn) 38%, transparent);
+}
+
+.jq-sl {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  color: var(--muted);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.jq-step.is-done .jq-sl { color: var(--muted); }
+.jq-step.is-current .jq-sl { color: var(--fg); font-weight: 500; }
+/* 400px phones: five 11px words do not fit five 60px columns, so only the
+   current step keeps its word on screen. The other four stay in the DOM for
+   screen readers (the list's aria-label names the step too). The current
+   word may spill past its column edge, since its neighbors are blank. */
+@media (max-width: 480px) {
+  .jq-sl { letter-spacing: .01em; }
+  .jq-step:not(.is-current) .jq-sl {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .jq-step.is-current .jq-sl { max-width: none; overflow: visible; }
+}
+
+/* status row under the timeline */
+.jq-status { display: flex; align-items: flex-start; gap: 8px; margin: 0; font-size: 13px; line-height: 1.45; }
+.jq-status .dot { margin-top: 5px; }
+.jq-status-ready { color: var(--warn); font-weight: 600; }
+.jq-note { margin: -3px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+
+.jq-qactions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+
+/* View draft reveal */
+.jq-prepped svg { flex: none; }
+.jq-openform, .jq-openform:hover, .jq-openform:focus { text-decoration: none; }
+.jq-openform svg { flex: none; }
+.jq-helper .jq-hstep { margin: 12px 0 4px; font-weight: 600; font-size: 13px; }
+.jq-helper .jq-hlist { margin: 0; padding-left: 22px; font-size: 13px; line-height: 1.5; }
+.jq-helper .jq-hbul { list-style: disc; }
+.jq-helper .jq-hlist li { margin: 2px 0; overflow-wrap: anywhere; }
+.jq-helper .jq-copyrow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 8px 0; }
+.jq-helper .jq-copynote { font-size: 12px; color: var(--muted); }
+.jq-helper .jq-prompt { display: block; width: 100%; box-sizing: border-box; font-family: var(--mono); font-size: 12px; line-height: 1.45; color: inherit; background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 10px; resize: vertical; white-space: pre; overflow: auto; }
+.jq-draft {
+  display: grid;
+  gap: 5px;
+  padding: 10px 12px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-chip);
+  background: var(--panel);
+}
+.jq-draft-k {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.jq-draft p { margin: 0; font-size: 12.5px; line-height: 1.5; }
+.jq-draft .jq-draft-sub { color: var(--muted); }
+
+/* View documents reveal: the two file names and the folder they sit in */
+.jq-docs {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-chip);
+  background: var(--panel);
+}
+.jq-doclist { margin: 0; padding: 0; list-style: none; display: grid; gap: 5px; }
+.jq-doclist li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.jq-docs .jq-draft-sub { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+/* a saved draft link: readable in the list color, accent on hover like every
+   other link, with the out icon as the new-tab affordance */
+.jq-doclink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 24px;
+  color: var(--fg);
+  text-decoration: underline dotted color-mix(in oklab, var(--fg), transparent 60%);
+  text-underline-offset: 3px;
+}
+.jq-doclink svg { flex: none; color: var(--faint); }
+.jq-doclink:hover { color: var(--accent); text-decoration: underline solid var(--accent); }
+.jq-doclink:hover svg { color: var(--accent); }
+/* a backup copy of the same file, stored with the page, for a viewer who is not signed in to GitHub */
+.jq-docalt, .dw-docalt {
+  flex: none;
+  margin-left: 4px;
+  font-size: 11.5px;
+  color: var(--muted);
+  text-decoration: underline dotted color-mix(in oklab, var(--fg), transparent 60%);
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+.jq-docalt:hover, .dw-docalt:hover { color: var(--accent); text-decoration: underline solid var(--accent); }
+
+/* -------- empty states ---------------------------------------------------- */
+.jq-empty {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  padding: 26px 14px 28px;
+  text-align: center;
+}
+.jq-empty svg { color: var(--faint); margin-bottom: 5px; }
+.jq-empty-t { font-weight: 600; font-size: 14px; }
+.jq-empty-s { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); max-width: 36ch; }
+
+@media (prefers-reduced-motion: reduce) {
+  .jq-dot { animation: none !important; }
+}

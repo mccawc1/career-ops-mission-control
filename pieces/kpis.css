@@ -1,0 +1,274 @@
+/* ===== panel: kpis (At a glance briefing + floating KPI deck) ============ */
+.kpi-panel .panel-body { padding-top: 12px; }
+
+/* --- briefing line ------------------------------------------------------- */
+/* no separator glyphs between clauses: the flex gap separates them, so a
+   wrapped line on a phone never ends in a dangling "·" */
+.kpi-brief {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 4px;
+  margin: 0;
+  font-size: 14.5px;
+}
+.brief-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 9px;
+  border-radius: var(--r-chip);
+  color: var(--fg);
+  font-weight: 500;
+}
+.brief-link .brief-t {
+  text-decoration: underline dotted color-mix(in oklab, var(--fg), transparent 60%);
+  text-underline-offset: 4px;
+}
+.brief-link:hover { background: color-mix(in oklab, var(--fg), transparent 93%); text-decoration: none; }
+.brief-link:hover .brief-t { text-decoration: underline solid var(--accent); text-underline-offset: 4px; }
+.brief-n { font-family: var(--mono); font-weight: 500; }
+.brief-glow { box-shadow: 0 0 8px var(--glow); }
+.brief-quiet {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  color: var(--muted);
+}
+
+/* one plain sentence: board, queue, what waits on Chris */
+.kpi-summary {
+  margin: 2px 0 0;
+  padding-left: 9px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--fg);
+}
+
+.kpi-subline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  margin: 2px 0 14px;
+  padding-left: 9px;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.kpi-subline .sub-item { white-space: nowrap; }
+.kpi-subline .mono { font-size: 12px; }
+
+/* --- the deck ------------------------------------------------------------ */
+/* six columns on a wide screen: the hero takes three, the nine others fill
+   the rest in two even rows. Three columns in between (hero on its own
+   row), two on a phone (hero and the last tile span both). */
+.kpi-deck { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+.kpi-tile.is-hero { grid-column: span 3; }
+@media (max-width: 1199px) {
+  .kpi-deck { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 619px) {
+  .kpi-deck { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .kpi-tile.is-hero, .kpi-tile:last-child { grid-column: span 2; }
+}
+
+.kpi-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
+  min-width: 0;
+  padding: 12px 13px;
+  text-align: left;
+  cursor: pointer;
+  /* a tile is a button: its edge needs to read as one in every theme */
+  border-color: var(--line-strong, var(--line));
+}
+.kpi-tile .k-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.35;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  min-height: 30px;
+}
+.kpi-tile .k-num {
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1.05;
+  letter-spacing: .01em;
+  color: var(--fg);
+}
+.kpi-tile .k-suffix { font-size: 14px; font-weight: 600; color: var(--muted); margin-left: 3px; letter-spacing: .03em; }
+/* number and its week-over-week chip share one baseline; the chip wraps
+   under the number on a narrow tile instead of squeezing it */
+.kpi-tile .k-numrow { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 8px; min-width: 0; }
+.kpi-tile .k-delta {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.6;
+  padding: 0 7px;
+  letter-spacing: .02em;
+}
+/* tiles without a sparkline: a footer line of context pinned to the
+   bottom so every tile in a row ends on the same edge */
+.kpi-tile .k-foot {
+  display: grid;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--faint);
+}
+/* a flat-at-zero trend says so in words, sitting where the sparkline would */
+.kpi-tile .k-foot.k-idle { padding-top: 16px; }
+/* a second line under a sparkline (Offers: the hired count): no auto
+   margin of its own, so the trend above keeps pinning both to the bottom */
+.kpi-tile .k-foot.k-after { margin-top: 0; padding-top: 6px; }
+.kpi-tile .k-foot.k-after .dot { margin-right: 5px; }
+/* the footer carries meaning ("none on the calendar", "starts at first
+   send"), so on a narrow tile it wraps to a second line instead of ending
+   in an ellipsis that loses the point */
+.kpi-tile .k-foot-t { white-space: normal; overflow-wrap: break-word; }
+.kpi-tile.is-jump .k-foot-t { color: var(--muted); text-decoration: underline dotted color-mix(in oklab, var(--fg), transparent 60%); text-underline-offset: 3px; }
+.kpi-tile.is-jump:hover .k-foot-t { color: var(--fg); text-decoration-style: solid; text-decoration-color: var(--accent); }
+/* coverage bar: length is the number (boards producing of boards enabled) */
+.kpi-tile .k-bar { display: block; height: 6px; border-radius: 3px; background: color-mix(in oklab, var(--fg), transparent 90%); overflow: hidden; }
+.kpi-tile .k-bar i { display: block; height: 100%; border-radius: 3px; background: var(--good); }
+.kpi-tile .k-bar i.is-accent { background: var(--accent); }
+/* no data behind this number yet: words instead, sized to hold the line */
+.kpi-tile .k-num.is-na {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  line-height: 1.2;
+  color: var(--muted);
+}
+.kpi-tile .k-ctx { font-size: 12px; line-height: 1.35; color: var(--muted); min-height: 32px; }
+
+/* --- the hero tile ------------------------------------------------------- */
+/* one dominant number: bigger type, a goal bar whose length is the number,
+   and the 14-day trend across the full width at the bottom edge */
+.kpi-tile.is-hero { padding: 14px 16px; }
+.kpi-tile.is-hero .k-num { font-size: 44px; line-height: 1; }
+.kpi-tile.is-hero .k-suffix { font-size: 18px; }
+.kpi-tile.is-hero .k-ctx { min-height: 0; font-size: 13px; }
+.kpi-tile.is-hero .k-hero-foot { display: flex; align-items: flex-end; gap: 24px; margin-top: auto; padding-top: 14px; min-width: 0; }
+.kpi-tile.is-hero .k-hero-foot > * { flex: 1 1 0; min-width: 0; }
+.kpi-tile.is-hero .k-foot { margin-top: 0; padding-top: 0; }
+.kpi-tile.is-hero .k-bar { height: 8px; border-radius: 4px; }
+.kpi-tile.is-hero .k-bar i { border-radius: 4px; }
+.kpi-tile .k-spark-wide { position: relative; display: block; width: 100%; height: 40px; margin: 0; padding: 0; }
+.kpi-tile .k-spark-wide .k-spark { width: 100%; height: 100%; margin: 0; padding: 0; }
+.kpi-tile .k-spark-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent), transparent 82%);
+}
+.kpi-tile .k-spark { display: block; width: 100%; height: auto; margin-top: auto; padding-top: 6px; }
+.kpi-tile[aria-expanded="true"] {
+  border-color: color-mix(in oklab, var(--accent), transparent 30%);
+  box-shadow: inset 0 1px 0 var(--hiline), 0 0 0 1px color-mix(in oklab, var(--accent), transparent 70%), var(--shadow-panel);
+}
+
+/* --- inline expansion ---------------------------------------------------- */
+.kpi-expand {
+  margin-top: 12px;
+  padding: 14px 16px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  background: var(--panel2);
+}
+.kx-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.kx-title { font-family: var(--disp); font-weight: 600; font-size: 13px; letter-spacing: .07em; text-transform: uppercase; }
+.kx-close { margin-left: auto; width: 40px; height: 40px; min-height: 40px; padding: 0; border-radius: var(--r-chip); flex: none; }
+.kx-caption { margin: 4px 0 10px; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+.kx-chart { position: relative; }
+.kx-chart svg { display: block; width: 100%; height: auto; }
+.kx-grid { stroke: var(--line); stroke-width: 1; opacity: .6; }
+.kx-base { stroke: var(--line); stroke-width: 1; }
+.kx-lab { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+.kx-end { font-family: var(--mono); font-size: 13px; font-weight: 500; fill: var(--fg); }
+.kx-tip {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -130%);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-chip);
+  padding: 3px 9px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg);
+  white-space: nowrap;
+  box-shadow: var(--shadow-panel);
+  pointer-events: none;
+}
+
+/* breakdown rows */
+.kx-rows { display: grid; gap: 9px; margin-top: 12px; }
+.kpi-expand.is-rows .kx-rows { margin-top: 2px; }
+.kx-row { display: flex; align-items: baseline; gap: 9px; font-size: 13px; min-width: 0; }
+.kx-main { min-width: 0; overflow-wrap: anywhere; }
+.kx-sub { color: var(--muted); }
+.kx-right { margin-left: auto; flex: none; font-family: var(--mono); font-size: 12px; color: var(--muted); white-space: nowrap; padding-left: 8px; }
+.kx-more { font-size: 12px; color: var(--faint); font-family: var(--mono); }
+
+/* fit-score band bars. Colors live here, by class, so the bands stay
+   apart even where two status tokens share one hue: Borderline takes a
+   dimmer warn (lightness step toward the surface) plus a warn outline,
+   so it never twins with the amber accent in dark ops; in field green,
+   Strong steps up to the lime data accent so it never twins with the
+   green accent on Good. */
+.kx-band .dot.kxb-strong, .kx-band-bar i.kxb-strong { background: var(--good); }
+.kx-band .dot.kxb-good, .kx-band-bar i.kxb-good { background: var(--accent); }
+.kx-band .dot.kxb-edge, .kx-band-bar i.kxb-edge {
+  background: color-mix(in oklab, var(--warn) 45%, var(--panel2));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--warn), transparent 25%);
+}
+.kx-band .dot.kxb-weak, .kx-band-bar i.kxb-weak { background: var(--idle); }
+[data-cctheme="t-green"] .kx-band .dot.kxb-strong,
+[data-cctheme="t-green"] .kx-band-bar i.kxb-strong { background: var(--hot); }
+.kx-bands { display: grid; gap: 10px; margin: 4px 0 2px; }
+.kx-band { display: grid; grid-template-columns: minmax(120px, 190px) 1fr 30px; align-items: center; gap: 10px; font-size: 12.5px; }
+/* flex-wrap, not overflow clip: on a narrow phone the range caption drops to
+   its own line instead of losing its last digit */
+.kx-band-name { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 1px 7px; min-width: 0; white-space: nowrap; }
+.kx-band-name small { color: var(--faint); font-size: 11px; font-family: var(--mono); }
+.kx-band-bar { display: block; height: 10px; border-radius: 5px; background: color-mix(in oklab, var(--fg), transparent 92%); overflow: hidden; }
+.kx-band-bar i { display: block; height: 100%; border-radius: 5px; }
+.kx-band-n { text-align: right; font-size: 12px; color: var(--fg); }
+
+.kx-meaning { margin: 12px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--fg); }
+
+@media (max-width: 619px) {
+  .kpi-tile .k-num { font-size: 26px; }
+  .kpi-tile .k-delta { padding: 0 6px; }
+  .kpi-tile { padding: 11px 11px; }
+  .kpi-tile.is-hero { padding: 12px 13px; }
+  .kpi-tile.is-hero .k-num { font-size: 36px; }
+  .kx-band { grid-template-columns: minmax(0, 1.3fr) minmax(56px, 1fr) 24px; gap: 8px; }
+}
+
+/* number tick-up (kpis.js tickNumbers): while a changed number counts to
+   its new value the digits take the accent and one soft glow, then ease
+   back to the tile's own color */
+.kpi-tile .k-num { transition: color .45s ease, text-shadow .45s ease; }
+.kpi-tile.is-ticking .k-num { color: var(--accent); text-shadow: 0 0 14px var(--glow); transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  .kpi-tile .k-num, .kpi-tile.is-ticking .k-num { transition: none; text-shadow: none; }
+}

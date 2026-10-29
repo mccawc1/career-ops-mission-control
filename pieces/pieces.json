@@ -1,0 +1,36 @@
+{
+  "pieces": [
+    "targeting",
+    "kpis",
+    "needs-you",
+    "jobs-queue",
+    "know-you",
+    "pipeline",
+    "tracker",
+    "inbox",
+    "mail",
+    "calendar",
+    "platforms",
+    "activity",
+    "career-path",
+    "drawer",
+    "jarvis"
+  ],
+  "css": [
+    "targeting",
+    "kpis",
+    "needs-you",
+    "jobs-queue",
+    "know-you",
+    "pipeline",
+    "tracker",
+    "inbox",
+    "calendar",
+    "platforms",
+    "activity",
+    "career-path",
+    "drawer",
+    "jarvis",
+    "mail"
+  ]
+}

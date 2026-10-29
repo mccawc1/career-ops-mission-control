@@ -1,0 +1,1035 @@
+/* ============================================================================
+   CAREER MISSION CONTROL - foundation: themes, shell, primitives
+   ----------------------------------------------------------------------------
+   Categorical palette validation (dataviz validate_palette.js), final runs:
+
+   t-dark-ops  --c1..--c6 vs --panel #0E1521 (--mode dark):
+     [PASS] Lightness band       all 6 inside L 0.48-0.67
+     [PASS] Chroma floor         all 6 >= 0.1
+     [PASS] CVD separation       worst adjacent #c98500<->#199e70 dE 8.4 (protan), tritan 8.7
+     [PASS] Normal-vision floor  worst adjacent #d55181<->#c98500 dE 19.3
+     [PASS] Contrast vs surface  all 6 >= 3:1          -> ALL CHECKS PASS
+   t-light-pro --c1..--c6 vs --panel #FFFFFF (--mode light):
+     [PASS] Lightness band       all 6 inside L 0.43-0.77
+     [PASS] Chroma floor         all 6 >= 0.1
+     [PASS] CVD separation       worst adjacent #b98400<->#12a06d dE 8.3 (protan), tritan 8.6
+     [PASS] Normal-vision floor  worst adjacent #b98400<->#12a06d dE 17.7
+     [PASS] Contrast vs surface  all 6 >= 3:1          -> ALL CHECKS PASS
+   t-bold      --c1..--c6 vs --panel #1B1512 (--mode dark):
+     [PASS] all five checks (CVD worst 8.4 protan, normal worst 19.3,
+            contrast all >= 3:1)                        -> ALL CHECKS PASS
+   t-green     --c1..--c6 vs --panel #111B16 (--mode dark):
+     [PASS] all five checks (CVD worst 8.4 protan, normal worst 19.3,
+            contrast all >= 3:1)                        -> ALL CHECKS PASS
+
+   Status colors (--good --warn --bad) are reserved for state, never series.
+
+   --line-strong is the control edge. It must clear 3:1 on --panel2 as well
+   as --panel, because most buttons, inputs and filter chips sit on a
+   --panel2 card: ops #5F7394 (3.70 / 3.22), light #788799 (3.67 / 3.12),
+   bold #836353 (3.36 / 3.06), green #527661 (3.46 / 3.02).
+   ========================================================================== */
+
+/* Theme-identity constants for the four theme swatch buttons. These are the
+   same in every theme on purpose: each swatch shows its own theme's accent. */
+:root {
+  --sw-ops: #FFB42E;
+  --sw-pro: #1F5ED6;
+  --sw-bold: #FF5C1F;
+  --sw-green: #35D97B;
+}
+
+/* --- Three-state viewer-scheme mapping (no explicit pick) ----------------- */
+/* 1. bare :root = light default */
+:root {
+  color-scheme: light;
+  --bg: #ECF0F5;
+  --bg2: #F7F9FC;
+  --panel: #FFFFFF;
+  --panel2: #E8EDF4;
+  --line: #D3DAE4;
+  --line-strong: #788799;
+  --fg: #111B27;
+  --muted: #4F6179;
+  --faint: #5E6B7C;
+  --accent: #1F5ED6;
+  --accent-ink: #FFFFFF;
+  --glow: rgba(31,94,214,.22);
+  --good: #126B40;
+  --warn: #8A5000;
+  --bad: #B52438;
+  --bad-ink: #FFFFFF;
+  --hot: #BF3F0A;
+  --info: #0B6588;
+  --ivl: #6446C4;
+  --idle: #76848F;
+  --c1: #2A78D6;
+  --c2: #EB6834;
+  --c3: #12A06D;
+  --c4: #B98400;
+  --c5: #D4568A;
+  --c6: #4A3AA7;
+  --r-panel: 10px;
+  --r-chip: 7px;
+  --hiline: rgba(255,255,255,.9);
+  --shadow-panel: 0 1px 2px rgba(22,34,47,.05), 0 10px 24px rgba(22,34,47,.07);
+  --shadow-panel-hover: 0 2px 4px rgba(22,34,47,.06), 0 16px 32px rgba(22,34,47,.13);
+  --scan: transparent;
+  --disp: "Chakra Petch", "IBM Plex Sans", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* 2. viewer prefers dark, host has not stamped light, no explicit pick */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-cctheme]) {
+  color-scheme: dark;
+  --bg: #060910;
+  --bg2: #0B111B;
+  --panel: #101826;
+  --panel2: #19243A;
+  --line: #243247;
+  --line-strong: #5F7394;
+  --fg: #EEF3FA;
+  --muted: #97A8C0;
+  --faint: #8292AA;
+  --accent: #FFB42E;
+  --accent-ink: #1C1200;
+  --glow: rgba(255,180,46,.38);
+  --good: #3BDF93;
+  --warn: #FFB42E;
+  --bad: #FF5F75;
+  --bad-ink: #2A050B;
+  --hot: #FF8C3B;
+  --info: #4FC7FF;
+  --ivl: #AE95FF;
+  --idle: #6A7D96;
+  --c1: #3987E5;
+  --c2: #D95926;
+  --c3: #199E70;
+  --c4: #C98500;
+  --c5: #D55181;
+  --c6: #9085E9;
+  --r-panel: 10px;
+  --r-chip: 7px;
+  --hiline: rgba(228,237,248,.07);
+  --shadow-panel: 0 1px 0 rgba(0,0,0,.3), 0 12px 28px rgba(2,6,12,.45);
+  --shadow-panel-hover: 0 2px 0 rgba(0,0,0,.3), 0 18px 38px rgba(2,6,12,.62);
+  --scan: rgba(170,200,255,.013);
+  --disp: "Chakra Petch", "IBM Plex Sans", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+}
+
+/* 3. host stamped dark, no explicit pick */
+:root[data-theme="dark"]:not([data-cctheme]) {
+  color-scheme: dark;
+  --bg: #060910;
+  --bg2: #0B111B;
+  --panel: #101826;
+  --panel2: #19243A;
+  --line: #243247;
+  --line-strong: #5F7394;
+  --fg: #EEF3FA;
+  --muted: #97A8C0;
+  --faint: #8292AA;
+  --accent: #FFB42E;
+  --accent-ink: #1C1200;
+  --glow: rgba(255,180,46,.38);
+  --good: #3BDF93;
+  --warn: #FFB42E;
+  --bad: #FF5F75;
+  --bad-ink: #2A050B;
+  --hot: #FF8C3B;
+  --info: #4FC7FF;
+  --ivl: #AE95FF;
+  --idle: #6A7D96;
+  --c1: #3987E5;
+  --c2: #D95926;
+  --c3: #199E70;
+  --c4: #C98500;
+  --c5: #D55181;
+  --c6: #9085E9;
+  --r-panel: 10px;
+  --r-chip: 7px;
+  --hiline: rgba(228,237,248,.07);
+  --shadow-panel: 0 1px 0 rgba(0,0,0,.3), 0 12px 28px rgba(2,6,12,.45);
+  --shadow-panel-hover: 0 2px 0 rgba(0,0,0,.3), 0 18px 38px rgba(2,6,12,.62);
+  --scan: rgba(170,200,255,.013);
+  --disp: "Chakra Petch", "IBM Plex Sans", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* --- Explicit theme picks (data-cctheme on <html>) ------------------------ */
+:root[data-cctheme="t-dark-ops"] {
+  color-scheme: dark;
+  --bg: #060910;
+  --bg2: #0B111B;
+  --panel: #101826;
+  --panel2: #19243A;
+  --line: #243247;
+  --line-strong: #5F7394;
+  --fg: #EEF3FA;
+  --muted: #97A8C0;
+  --faint: #8292AA;
+  --accent: #FFB42E;
+  --accent-ink: #1C1200;
+  --glow: rgba(255,180,46,.38);
+  --good: #3BDF93;
+  --warn: #FFB42E;
+  --bad: #FF5F75;
+  --bad-ink: #2A050B;
+  --hot: #FF8C3B;
+  --info: #4FC7FF;
+  --ivl: #AE95FF;
+  --idle: #6A7D96;
+  --c1: #3987E5;
+  --c2: #D95926;
+  --c3: #199E70;
+  --c4: #C98500;
+  --c5: #D55181;
+  --c6: #9085E9;
+  --r-panel: 10px;
+  --r-chip: 7px;
+  --hiline: rgba(228,237,248,.07);
+  --shadow-panel: 0 1px 0 rgba(0,0,0,.3), 0 12px 28px rgba(2,6,12,.45);
+  --shadow-panel-hover: 0 2px 0 rgba(0,0,0,.3), 0 18px 38px rgba(2,6,12,.62);
+  --scan: rgba(170,200,255,.013);
+  --disp: "Chakra Petch", "IBM Plex Sans", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+:root[data-cctheme="t-light-pro"] {
+  color-scheme: light;
+  --bg: #ECF0F5;
+  --bg2: #F7F9FC;
+  --panel: #FFFFFF;
+  --panel2: #E8EDF4;
+  --line: #D3DAE4;
+  --line-strong: #788799;
+  --fg: #111B27;
+  --muted: #4F6179;
+  --faint: #5E6B7C;
+  --accent: #1F5ED6;
+  --accent-ink: #FFFFFF;
+  --glow: rgba(31,94,214,.22);
+  --good: #126B40;
+  --warn: #8A5000;
+  --bad: #B52438;
+  --bad-ink: #FFFFFF;
+  --hot: #BF3F0A;
+  --info: #0B6588;
+  --ivl: #6446C4;
+  --idle: #76848F;
+  --c1: #2A78D6;
+  --c2: #EB6834;
+  --c3: #12A06D;
+  --c4: #B98400;
+  --c5: #D4568A;
+  --c6: #4A3AA7;
+  --r-panel: 10px;
+  --r-chip: 7px;
+  --hiline: rgba(255,255,255,.9);
+  --shadow-panel: 0 1px 2px rgba(22,34,47,.05), 0 10px 24px rgba(22,34,47,.07);
+  --shadow-panel-hover: 0 2px 4px rgba(22,34,47,.06), 0 16px 32px rgba(22,34,47,.13);
+  --scan: transparent;
+  --disp: "Chakra Petch", "IBM Plex Sans", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+:root[data-cctheme="t-bold"] {
+  color-scheme: dark;
+  --bg: #0C0806;
+  --bg2: #120D0A;
+  --panel: #1B1410;
+  --panel2: #281C16;
+  --line: #402D23;
+  --line-strong: #836353;
+  --fg: #F9F0E9;
+  --muted: #BEA796;
+  --faint: #A28F80;
+  --accent: #FF5C1F;
+  --accent-ink: #210A02;
+  --glow: rgba(255,92,31,.42);
+  --good: #3DDC97;
+  --warn: #FFC53D;
+  --bad: #FF4D5E;
+  --bad-ink: #2A0509;
+  --hot: #FFD21F;
+  --info: #4FB9FF;
+  --ivl: #B899FF;
+  --idle: #9C8A7B;
+  --c1: #3987E5;
+  --c2: #D95926;
+  --c3: #199E70;
+  --c4: #C98500;
+  --c5: #D55181;
+  --c6: #9085E9;
+  --r-panel: 10px;
+  --r-chip: 7px;
+  --hiline: rgba(245,234,226,.07);
+  --shadow-panel: 0 1px 0 rgba(0,0,0,.35), 0 12px 28px rgba(8,4,2,.5);
+  --shadow-panel-hover: 0 2px 0 rgba(0,0,0,.35), 0 18px 38px rgba(8,4,2,.66);
+  --scan: rgba(255,214,160,.013);
+  --disp: "Chakra Petch", "IBM Plex Sans", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+:root[data-cctheme="t-green"] {
+  color-scheme: dark;
+  --bg: #060C09;
+  --bg2: #0B130F;
+  --panel: #111B16;
+  --panel2: #19281F;
+  --line: #28392E;
+  --line-strong: #527661;
+  --fg: #E8F5EC;
+  --muted: #91B29E;
+  --faint: #7D998A;
+  --accent: #35D97B;
+  --accent-ink: #03180C;
+  --glow: rgba(53,217,123,.35);
+  --good: #35D97B;
+  --warn: #EFC94A;
+  --bad: #FF6B7E;
+  --bad-ink: #2A070D;
+  --hot: #B6F09C;
+  --info: #4FC7FF;
+  --ivl: #AE95FF;
+  --idle: #6B8B78;
+  --c1: #3987E5;
+  --c2: #D95926;
+  --c3: #199E70;
+  --c4: #C98500;
+  --c5: #D55181;
+  --c6: #9085E9;
+  --r-panel: 10px;
+  --r-chip: 7px;
+  --hiline: rgba(226,242,232,.06);
+  --shadow-panel: 0 1px 0 rgba(0,0,0,.32), 0 12px 28px rgba(2,8,5,.5);
+  --shadow-panel-hover: 0 2px 0 rgba(0,0,0,.32), 0 18px 38px rgba(2,8,5,.64);
+  --scan: rgba(182,240,156,.012);
+  --disp: "Chakra Petch", "IBM Plex Sans", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* ========================== base & page chrome =========================== */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.5;
+}
+[hidden] { display: none !important; }
+img, svg { max-width: 100%; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font: inherit; color: inherit; }
+input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+::selection { background: var(--accent); color: var(--accent-ink); }
+
+/* barely-there scanline backdrop; --scan is transparent on light themes */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, var(--scan) 0 1px, transparent 1px 4px);
+}
+.cmdbar, main, .cmc-footer { position: relative; z-index: 1; }
+/* the neural canvas (piece: jarvis) sits under everything, including the
+   scanline overlay (body::before at z-index 0); panels stay opaque */
+#jarvisCanvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; display: block; }
+
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ========================== command bar ================================== */
+.cmdbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--line);
+}
+.cmdbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+}
+.brand { display: flex; flex-direction: column; gap: 0; min-width: 0; }
+.brand-row { display: flex; align-items: center; gap: 8px; }
+.brand-mark { color: var(--accent); flex: none; }
+.wordmark {
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.brand-sub { color: var(--muted); font-size: 12px; line-height: 1.3; }
+
+.cmd-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 11px 4px 9px;
+  margin-right: 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.live-pill.is-live { color: var(--good); border-color: color-mix(in oklab, var(--good), transparent 65%); }
+.live-pill.is-live .dot { box-shadow: 0 0 8px var(--glow); }
+/* the live sweep: a thin band of light crosses the pill every few seconds
+   while the board is truly connected. Honest by construction: it runs only
+   on .is-live and stops on Preview and Offline (.is-degraded). The band is
+   a faint tint of --good under the text, peaking at 20%, so the label stays
+   above 4.5:1 at the band's brightest point in every theme (light 4.8:1).
+   Reduced motion and the effects switch (html.fx-off) turn it off. */
+.live-pill { position: relative; overflow: hidden; isolation: isolate; }
+.live-pill > * { position: relative; z-index: 1; }
+.live-pill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 46%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(100deg, transparent 0%, color-mix(in oklab, var(--good), transparent 90%) 44%, color-mix(in oklab, var(--good), transparent 80%) 50%, color-mix(in oklab, var(--good), transparent 90%) 56%, transparent 100%);
+  transform: translateX(-130%);
+}
+.live-pill.is-live:not(.is-degraded)::after {
+  opacity: 1;
+  animation: cmc-live-sweep 4.2s cubic-bezier(.45, 0, .25, 1) 1.2s infinite;
+}
+@keyframes cmc-live-sweep {
+  0% { transform: translateX(-130%); }
+  42% { transform: translateX(260%); }
+  100% { transform: translateX(260%); }
+}
+:root.fx-off .live-pill::after { animation: none; opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .live-pill.is-live:not(.is-degraded)::after { animation: none; opacity: 0; }
+}
+
+/* theme swatches and the neural toggle: 44px round targets (40px on
+   phones, see the 760px block), inner 18px coin for the swatches */
+.swatches { display: flex; align-items: center; }
+.jarvis-btn {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--muted);
+}
+.t-swatch {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.t-swatch .sw {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in oklab, var(--fg), transparent 55%);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.t-swatch[data-pick="t-dark-ops"] .sw { background: var(--sw-ops); }
+.t-swatch[data-pick="t-light-pro"] .sw { background: var(--sw-pro); }
+.t-swatch[data-pick="t-bold"] .sw { background: var(--sw-bold); }
+.t-swatch[data-pick="t-green"] .sw { background: var(--sw-green); }
+.t-swatch:hover .sw { transform: scale(1.18); }
+.t-swatch.is-active .sw {
+  border-color: var(--fg);
+  box-shadow: 0 0 0 3px var(--bg2), 0 0 12px var(--glow);
+}
+
+.add-link-btn { margin-left: 6px; gap: 7px; }
+.add-link-btn svg { flex: none; }
+.prep-now-btn { margin-left: 6px; gap: 7px; }
+.prep-now-btn svg { flex: none; }
+@media (max-width: 900px) { .prep-now-btn .add-label { display: none; } .prep-now-btn .add-label-s { display: inline; } }
+@media (max-width: 540px) { .btn.prep-now-btn { min-height: 44px; padding: 7px 12px; margin-left: 2px; } }
+.add-label-s { display: none; }
+/* phone width: the long label swaps for a short visible "Add", never a
+   bare unlabeled "+" circle; the target stays >= 44px tall */
+@media (max-width: 540px) {
+  .btn.add-link-btn { min-height: 44px; padding: 7px 12px; margin-left: 2px; }
+  .add-label { display: none; }
+  .add-label-s { display: inline; }
+  .cmdbar-inner { padding: 8px 16px; }
+  .wordmark { font-size: 13.5px; letter-spacing: .03em; }
+}
+/* phone and small tablet: the bar packs into two rows. Row one is the brand
+   and the live pill; row two is the theme swatches, the neural toggle, Add
+   and the search box. The subtitle goes; the search box grows to a full row
+   of its own while it has focus. */
+@media (max-width: 760px) {
+  .cmdbar-inner { gap: 6px 6px; }
+  .brand-sub { display: none; }
+  .cmd-controls { display: contents; }
+  .live-pill { order: 1; margin-left: auto; margin-right: 0; }
+  .swatches { order: 2; }
+  .jarvis-btn { order: 3; }
+  .add-link-btn { order: 4; margin-left: 0; }
+  .add-row { order: 10; }
+  .t-swatch, .jarvis-btn { width: 40px; height: 40px; }
+}
+
+.add-row {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0 6px;
+  flex-wrap: wrap;
+}
+.add-row input {
+  flex: 1 1 200px;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-chip);
+  color: var(--fg);
+}
+.add-row input::placeholder { color: var(--faint); }
+.add-row input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent), transparent 80%); }
+.add-note { flex: 1 1 100%; margin: 0; font-size: 12.5px; color: var(--muted); }
+.add-note.is-error { color: var(--bad); }
+
+/* ========================== main grid ==================================== */
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 18px 16px 44px;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+.panel-slot { grid-column: 1 / -1; min-width: 0; scroll-margin-top: calc(var(--cmdbar-h, 70px) + 14px); }
+/* panel chrome (HUD ticks, popovers) positions against the panel box */
+.panel-slot > .panel { position: relative; }
+@media (min-width: 980px) {
+  .panel-slot[data-panel="activity"] { grid-column: 1 / span 7; }
+  .panel-slot[data-panel="career-path"] { grid-column: 8 / span 5; }
+}
+
+/* ========================== shared primitives ============================ */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  box-shadow: var(--shadow-panel);
+}
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--line);
+}
+.panel-title {
+  margin: 0;
+  font-family: var(--disp);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.panel-kicker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.panel-body { padding: 14px 16px 16px; }
+
+/* elevation treatment: brighter surface, 1px top inner highlight, soft
+   shadow, and lift on hover/focus. KPI tiles are its loudest use. */
+.elev {
+  background: linear-gradient(180deg, var(--panel2), var(--panel));
+  /* KPI tiles are buttons, so the edge is the control border (3:1 on both
+     surface steps), not the hairline */
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-panel);
+  box-shadow: inset 0 1px 0 var(--hiline), var(--shadow-panel);
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+.elev:hover, .elev:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: inset 0 1px 0 var(--hiline), var(--shadow-panel-hover);
+}
+
+/* status dot grammar: identical in every theme */
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+  vertical-align: baseline;
+}
+.dot-good { background: var(--good); }
+.dot-info { background: var(--info); }
+.dot-warn { background: var(--warn); }
+.dot-ivl { background: var(--ivl); }
+.dot-bad { background: var(--bad); }
+.dot-idle { background: var(--idle); }
+.dot-hollow { background: transparent; box-shadow: inset 0 0 0 1.5px var(--idle); }
+.dot.pulse { animation: cmc-pulse 1.8s ease-in-out infinite; }
+@keyframes cmc-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .35; }
+}
+
+/* glow = state, never decoration */
+.needs-you { border-color: color-mix(in oklab, var(--hot), transparent 35%) !important; box-shadow: 0 0 0 1px color-mix(in oklab, var(--hot), transparent 55%), 0 0 16px var(--glow), var(--shadow-panel); }
+/* t-green keeps --hot as a lime DATA accent, so the "needs your review"
+   signal stays in the amber warn family there: glow border, step dot and
+   the ready text read as one hue instead of two */
+:root[data-cctheme="t-green"] .needs-you {
+  border-color: color-mix(in oklab, var(--warn), transparent 35%) !important;
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--warn), transparent 55%), 0 0 16px color-mix(in srgb, var(--warn) 38%, transparent), var(--shadow-panel);
+}
+
+/* chips */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 9px;
+  border-radius: var(--r-chip);
+  border: 1px solid var(--line);
+  background: var(--panel2);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.chip.mono { font-size: 11.5px; }
+.chip-good { color: var(--good); border-color: color-mix(in oklab, var(--good), transparent 60%); background: color-mix(in oklab, var(--good), transparent 90%); }
+.chip-info { color: var(--info); border-color: color-mix(in oklab, var(--info), transparent 60%); background: color-mix(in oklab, var(--info), transparent 90%); }
+.chip-warn { color: var(--warn); border-color: color-mix(in oklab, var(--warn), transparent 60%); background: color-mix(in oklab, var(--warn), transparent 90%); }
+.chip-ivl { color: var(--ivl); border-color: color-mix(in oklab, var(--ivl), transparent 60%); background: color-mix(in oklab, var(--ivl), transparent 90%); }
+.chip-bad { color: var(--bad); border-color: color-mix(in oklab, var(--bad), transparent 60%); background: color-mix(in oklab, var(--bad), transparent 90%); }
+.chip-idle { color: var(--muted); }
+.chip-accent { color: var(--accent); border-color: color-mix(in oklab, var(--accent), transparent 55%); background: color-mix(in oklab, var(--accent), transparent 90%); }
+
+/* buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 7px 14px;
+  border-radius: var(--r-chip);
+  border: 1px solid var(--line-strong);
+  background: var(--panel2);
+  color: var(--fg);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s ease, border-color .12s ease, transform .12s ease;
+}
+.btn:hover { background: color-mix(in oklab, var(--panel2), var(--fg) 7%); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .55; cursor: default; transform: none; }
+.btn-primary { background: var(--accent); border-color: transparent; color: var(--accent-ink); }
+.btn-primary:hover { background: color-mix(in oklab, var(--accent), var(--fg) 10%); }
+.btn-danger { background: var(--bad); border-color: transparent; color: var(--bad-ink); }
+.btn-danger:hover { background: color-mix(in oklab, var(--bad), var(--fg) 10%); }
+.btn-ghost { background: transparent; }
+.btn-ghost:hover { background: color-mix(in oklab, var(--fg), transparent 93%); }
+
+/* ========================== ghost skeletons ============================== */
+.panel-slot:not(.is-ghost) > .ghost { display: none; }
+.ghost { padding: 14px 16px 18px; }
+.ghost-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.ghost-title {
+  font-family: var(--disp);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.ghost-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--faint);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.ghost-rows { display: grid; gap: 10px; }
+.ghost-rows i {
+  display: block;
+  height: 13px;
+  width: var(--w, 60%);
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--panel2) 25%, color-mix(in oklab, var(--panel2), var(--fg) 5%) 46%, var(--panel2) 65%);
+  background-size: 220% 100%;
+  animation: cmc-shimmer 1.9s linear infinite;
+}
+@keyframes cmc-shimmer {
+  from { background-position: 130% 0; }
+  to { background-position: -90% 0; }
+}
+
+/* ===================== save-failure notice =============================== */
+/* fixed toast so Chris sees it from anywhere on the page when a write
+   does not stick (quota full, connection trouble) */
+.save-notice {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(480px, calc(100vw - 32px));
+  padding: 8px 8px 8px 14px;
+  border: 1px solid color-mix(in oklab, var(--warn), transparent 45%);
+  border-radius: var(--r-panel);
+  background: var(--panel);
+  color: var(--fg);
+  box-shadow: var(--shadow-panel);
+}
+.save-notice p { margin: 0; font-size: 13.5px; flex: 1; }
+
+/* ========================== footer ======================================= */
+.cmc-footer { border-top: 1px solid var(--line); background: var(--bg2); margin-top: 8px; }
+.footer-inner { max-width: 1200px; margin: 0 auto; padding: 14px 16px 22px; }
+.sample-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  border: 1px solid color-mix(in oklab, var(--warn), transparent 55%);
+  border-radius: var(--r-panel);
+  background: color-mix(in oklab, var(--warn), transparent 92%);
+}
+.sample-banner p { margin: 0; font-size: 13.5px; flex: 1 1 240px; }
+.sample-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.sample-confirm { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.sync-line {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--faint);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.sync-line .mono { font-size: 11.5px; }
+
+/* ========================== #proof diagnostics =========================== */
+.proof { grid-column: 1 / -1; display: grid; gap: 18px; }
+.proof .panel-body { display: flex; flex-wrap: wrap; gap: 10px; }
+.proof-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; width: 100%; }
+.proof-swatch {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-chip);
+  background: var(--panel2);
+}
+.proof-swatch .pv { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--line); flex: none; }
+.proof-swatch .pn { font-family: var(--mono); font-size: 11px; line-height: 1.45; color: var(--fg); min-width: 0; overflow-wrap: anywhere; }
+.proof-swatch .pn small { display: block; color: var(--faint); }
+.proof-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; width: 100%; }
+.proof-label { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); flex: none; width: 100%; }
+.proof-dotcase { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--muted); }
+.spec-disp { font-family: var(--disp); font-weight: 700; font-size: 26px; letter-spacing: .03em; text-transform: uppercase; margin: 0; }
+.spec-body { margin: 0; max-width: 56ch; }
+.spec-mono { font-family: var(--mono); font-size: 13px; color: var(--muted); margin: 0; }
+.kpi-demo {
+  width: 240px;
+  padding: 14px 16px;
+  cursor: pointer;
+  text-align: left;
+}
+.kpi-demo .k-label { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.kpi-demo .k-num { font-family: var(--disp); font-weight: 700; font-size: 34px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.kpi-demo .k-delta { font-size: 12.5px; color: var(--muted); }
+.kpi-demo svg { display: block; margin-top: 8px; }
+
+/* ========================== reduced motion =============================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .ghost-rows i { animation: none; }
+  .dot.pulse { animation: none; }
+  /* no hover lifts or press shifts either: elevation reads through shadow alone */
+  .elev:hover, .elev:focus-visible { transform: none; }
+  .btn:active { transform: none; }
+}
+
+
+/* ========================== phase 2 shared primitives ==================== */
+/* band labels: one full-width row that names a group of panels */
+.band-label {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 0 -6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.band-label::after { content: ""; flex: 1 1 auto; height: 1px; background: var(--line); }
+.panel-slot[data-panel="drawer"]:empty { display: none; }
+
+/* command-bar search and the neural toggle */
+.jarvis-btn { color: var(--muted); }
+.jarvis-btn[aria-pressed="true"] { color: var(--accent); }
+.jarvis-btn:hover { color: var(--fg); }
+.cmd-search { display: flex; align-items: center; margin-left: 6px; }
+.cmd-search input {
+  width: 150px;
+  height: 40px;
+  padding: 0 12px;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-chip);
+  color: var(--fg);
+  transition: width .15s ease, border-color .12s ease, box-shadow .12s ease;
+}
+.cmd-search input::placeholder { color: var(--faint); }
+.cmd-search input:focus { width: 220px; border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent), transparent 80%); }
+@media (max-width: 760px) {
+  .cmd-search { flex: 1 1 56px; min-width: 0; margin-left: 0; order: 5; }
+  .cmd-search input { padding: 0 9px; }
+  .cmd-search input, .cmd-search input:focus { width: 100%; }
+  .cmd-search:focus-within { flex: 1 1 100%; order: 9; }
+}
+/* search hit flash: state glow, two seconds */
+.is-hit { box-shadow: 0 0 0 2px var(--accent), 0 0 18px var(--glow) !important; transition: box-shadow .2s ease; }
+
+/* form primitives: every panel's inputs, selects and text areas share one look */
+.field { display: grid; gap: 5px; min-width: 0; }
+.field > label, .field-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.field-hint { margin: 0; font-size: 12px; color: var(--faint); line-height: 1.45; }
+.input, .select-wrap select, textarea.input {
+  width: 100%;
+  min-height: 40px;
+  padding: 7px 11px;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-chip);
+  color: var(--fg);
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+textarea.input { min-height: 88px; resize: vertical; }
+.input::placeholder { color: var(--faint); }
+.input:focus, .select-wrap select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent), transparent 80%); }
+.input[aria-invalid="true"] { border-color: var(--bad); }
+/* native select, themed: tokens for the box, a CSS caret in --muted, and
+   color-scheme from the theme so the dropdown list follows dark or light */
+.select-wrap { position: relative; display: block; min-width: 0; }
+.select-wrap select { appearance: none; -webkit-appearance: none; padding-right: 32px; cursor: pointer; }
+.select-wrap::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -5px;
+  border-right: 1.8px solid var(--muted);
+  border-bottom: 1.8px solid var(--muted);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+.select-wrap.is-compact select { min-height: 34px; padding: 4px 28px 4px 9px; font-size: 12.5px; }
+.select-wrap.is-compact::after { right: 10px; }
+/* status-colored compact selects (tracker and drawer dropdowns) */
+.select-wrap[data-k="good"] select { color: var(--good); }
+.select-wrap[data-k="info"] select { color: var(--info); }
+.select-wrap[data-k="warn"] select { color: var(--warn); }
+.select-wrap[data-k="ivl"] select { color: var(--ivl); }
+.select-wrap[data-k="bad"] select { color: var(--bad); }
+.select-wrap[data-k="idle"] select { color: var(--muted); }
+.check { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; font-size: 13.5px; cursor: pointer; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); margin: 0; }
+.form-row { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.form-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 4px; }
+.form-actions .spacer { flex: 1 1 auto; }
+
+/* overlay + sheet (wizard, confirmations) and the right-side drawer */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: color-mix(in oklab, var(--bg), transparent 35%);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px;
+  overflow: auto;
+}
+.sheet {
+  width: min(680px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  box-shadow: var(--shadow-panel-hover);
+}
+.sheet .panel-head { position: sticky; top: 0; background: var(--panel); z-index: 1; }
+.sheet .panel-body { display: grid; gap: 14px; }
+.drawer-aside {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 85;
+  width: min(520px, 100%);
+  overflow: auto;
+  background: var(--panel);
+  border-left: 1px solid var(--line);
+  box-shadow: var(--shadow-panel-hover);
+  display: flex;
+  flex-direction: column;
+}
+.drawer-aside .panel-head { position: sticky; top: 0; background: var(--panel); z-index: 1; }
+.drawer-aside .panel-body { display: grid; gap: 14px; }
+.close-x { margin-left: auto; width: 40px; height: 40px; min-height: 40px; padding: 0; border-radius: var(--r-chip); flex: none; }
+@media (max-width: 540px) {
+  .overlay { padding: 0; align-items: stretch; }
+  .sheet { width: 100%; max-height: none; min-height: 100vh; border-radius: 0; border: 0; }
+}
+
+/* tables (tracker, inbox): sticky mono headers, 44px rows, no horizontal page scroll */
+.tbl-wrap { overflow: auto; max-height: 70vh; border: 1px solid var(--line); border-radius: var(--r-panel); background: var(--panel); }
+.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.tbl th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--panel2);
+  border-bottom: 1px solid var(--line);
+  padding: 8px 10px;
+  text-align: left;
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.tbl th button {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 36px;
+  min-width: 24px;
+  box-sizing: border-box;
+}
+.tbl th button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.tbl th button:hover { color: var(--fg); }
+.tbl th[aria-sort="ascending"] button, .tbl th[aria-sort="descending"] button { color: var(--accent); }
+.tbl td { padding: 6px 10px; border-top: 1px solid color-mix(in oklab, var(--line), transparent 40%); vertical-align: middle; min-height: 44px; }
+.tbl tr.is-clickable { cursor: pointer; }
+.tbl tr.is-clickable:hover td { background: color-mix(in oklab, var(--fg), transparent 95%); }
+.tbl .num { text-align: right; }
+.tbl .co { font-weight: 600; overflow-wrap: anywhere; }
+.tbl .muted { color: var(--muted); }
+.chip-row { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+.chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 4px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--panel2);
+  color: var(--fg);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.chip-btn:hover { background: color-mix(in oklab, var(--panel2), var(--fg) 7%); }
+.chip-btn[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in oklab, var(--accent), transparent 88%); }
+.chip-btn .n { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+.chip-btn[aria-pressed="true"] .n { color: var(--accent); }

@@ -1,0 +1,212 @@
+<header class="cmdbar" id="cmdbar">
+  <div class="cmdbar-inner">
+    <div class="brand">
+      <div class="brand-row">
+        <svg class="brand-mark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="7"></circle>
+          <line x1="12" y1="1.5" x2="12" y2="6"></line>
+          <line x1="12" y1="18" x2="12" y2="22.5"></line>
+          <line x1="1.5" y1="12" x2="6" y2="12"></line>
+          <line x1="18" y1="12" x2="22.5" y2="12"></line>
+          <circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"></circle>
+        </svg>
+        <span class="wordmark">Career Ops Mission Control</span>
+      </div>
+      <span class="brand-sub">Chris McCaw's job search</span>
+    </div>
+    <div class="cmd-controls">
+      <span class="live-pill" id="livePill" title="Connection to the live tracker">
+        <span class="dot dot-idle" id="liveDot"></span><span id="liveLabel">Preview</span>
+      </span>
+      <div class="swatches" role="group" aria-label="Color theme">
+        <button type="button" class="t-swatch" data-pick="t-dark-ops" aria-pressed="false" aria-label="Dark Mission Control theme" title="Dark Mission Control"><span class="sw"></span></button>
+        <button type="button" class="t-swatch" data-pick="t-light-pro" aria-pressed="false" aria-label="Clean Light Pro theme" title="Clean Light Pro"><span class="sw"></span></button>
+        <button type="button" class="t-swatch" data-pick="t-bold" aria-pressed="false" aria-label="High Energy Bold theme" title="High Energy Bold"><span class="sw"></span></button>
+        <button type="button" class="t-swatch" data-pick="t-green" aria-pressed="false" aria-label="Field Green theme" title="Field Green"><span class="sw"></span></button>
+      </div>
+      <button type="button" class="jarvis-btn" id="jarvisBtn" aria-pressed="false" aria-label="Neural background on or off" title="Neural background">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <circle cx="5" cy="12" r="2"></circle><circle cx="19" cy="6" r="2"></circle><circle cx="19" cy="18" r="2"></circle><circle cx="12" cy="9" r="2"></circle>
+          <line x1="7" y1="11.3" x2="10.2" y2="9.7"></line><line x1="13.8" y1="8.2" x2="17.2" y2="6.8"></line><line x1="13.3" y1="10.6" x2="17.4" y2="16.8"></line>
+        </svg>
+      </button>
+      <form class="cmd-search" id="cmdSearch" role="search">
+        <input id="cmdSearchInput" type="search" autocomplete="off" spellcheck="false" placeholder="Find a company" aria-label="Find a company on the board">
+      </form>
+      <button type="button" class="btn btn-ghost add-link-btn" id="addLinkBtn" aria-expanded="false" aria-controls="addLinkRow">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span class="add-label">Add a job link</span><span class="add-label-s">Add</span>
+      </button>
+      <button type="button" class="btn btn-primary prep-now-btn" id="prepNowBtn" title="Reconcile: Claude preps every job you tapped Apply on, right now">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        <span class="add-label">Reconcile current applications</span><span class="add-label-s">Reconcile</span>
+      </button>
+    </div>
+    <form class="add-row" id="addLinkRow" hidden>
+      <input id="addLinkInput" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="Paste the job posting link" aria-label="Job posting link">
+      <button type="submit" class="btn btn-primary" id="addLinkGo">Add it</button>
+      <button type="button" class="btn btn-ghost" id="addLinkCancel">Cancel</button>
+      <p class="add-note" id="addLinkNote" hidden></p>
+    </form>
+  </div>
+</header>
+
+<main id="cmcMain">
+  <section class="panel-slot is-ghost" data-panel="targeting" id="panel-targeting" aria-label="Targeting profile">
+    <div class="ghost panel">
+      <div class="ghost-head">
+        <span class="ghost-title">Targeting</span>
+        <span class="ghost-tag"><span class="dot dot-hollow"></span>standing by</span>
+      </div>
+      <div class="ghost-rows"><i style="--w:64%"></i><i style="--w:47%"></i><i style="--w:58%"></i></div>
+    </div>
+  </section>
+  <section class="panel-slot is-ghost" data-panel="kpis" id="panel-kpis" aria-label="At a glance">
+    <div class="ghost panel">
+      <div class="ghost-head">
+        <span class="ghost-title">At a glance</span>
+        <span class="ghost-tag"><span class="dot dot-hollow"></span>standing by</span>
+      </div>
+      <div class="ghost-rows"><i style="--w:68%"></i><i style="--w:42%"></i><i style="--w:55%"></i></div>
+    </div>
+  </section>
+
+  <h2 class="band-label"><span>Needs you</span></h2>
+  <section class="panel-slot is-ghost" data-panel="needs-you" id="panel-needs-you" aria-label="Needs you">
+    <div class="ghost panel">
+      <div class="ghost-head">
+        <span class="ghost-title">Waiting on Chris and interviews</span>
+        <span class="ghost-tag"><span class="dot dot-hollow"></span>standing by</span>
+      </div>
+      <div class="ghost-rows"><i style="--w:64%"></i><i style="--w:47%"></i><i style="--w:58%"></i></div>
+    </div>
+  </section>
+  <h2 class="band-label"><span>Action</span></h2>
+  <section class="panel-slot is-ghost" data-panel="jobs-queue" id="panel-jobs-queue" aria-label="Action center">
+    <div class="ghost panel">
+      <div class="ghost-head">
+        <span class="ghost-title">Action center</span>
+        <span class="ghost-tag"><span class="dot dot-hollow"></span>standing by</span>
+      </div>
+      <div class="ghost-rows"><i style="--w:58%"></i><i style="--w:72%"></i><i style="--w:40%"></i></div>
+    </div>
+  </section>
+
+  <section class="panel-slot is-ghost" data-panel="know-you" id="panel-know-you" aria-label="Get to know you">
+    <div class="ghost panel">
+      <div class="ghost-head">
+        <span class="ghost-title">Get to know you</span>
+        <span class="ghost-tag"><span class="dot dot-hollow"></span>standing by</span>
+      </div>
+      <div class="ghost-rows"><i style="--w:64%"></i><i style="--w:47%"></i><i style="--w:58%"></i></div>
+    </div>
+  </section>
+  <h2 class="band-label"><span>Email</span></h2>
+  <section class="panel-slot is-ghost" data-panel="mail" id="panel-mail" aria-label="Job emails">
+    <div class="ghost panel">
+      <div class="ghost-head">
+        <span class="ghost-title">Job emails</span>
+        <span class="ghost-tag"><span class="dot dot-hollow"></span>standing by</span>
+      </div>
+      <div class="ghost-rows"><i style="--w:66%"></i><i style="--w:49%"></i><i style="--w:57%"></i></div>
+    </div>
+  </section>
+  <h2 class="band-label"><span>Pipeline</span></h2>
+  <section class="panel-slot is-ghost" data-panel="pipeline" id="panel-pipeline" aria-label="Pipeline">
+    <div class="ghost panel">
+      <div class="ghost-head">
+        <span class="ghost-title">Pipeline</span>
+        <span class="ghost-tag"><span class="dot dot-hollow"></span>standing by</span>
+      </div>
+      <div class="ghost-rows"><i style="--w:75%"></i><i style="--w:52%"></i><i style="--w:63%"></i></div>
+    </div>
+  </section>
+
+  <section class="panel-slot is-ghost" data-panel="tracker" id="panel-tracker" aria-label="Application tracker">
+    <div class="ghost panel">
+      <div class="ghost-head">
+        <span class="ghost-title">Application tracker</span>
+        <span class="ghost-tag"><span class="dot dot-hollow"></span>standing by</span>
+      </div>
+      <div class="ghost-rows"><i style="--w:64%"></i><i style="--w:47%"></i><i style="--w:58%"></i></div>
+    </div>
+  </section>
+  <section class="panel-slot is-ghost" data-panel="inbox" id="panel-inbox" aria-label="Job inbox">
+    <div class="ghost panel">
+      <div class="ghost-head">
+        <span class="ghost-title">Job inbox</span>
+        <span class="ghost-tag"><span class="dot dot-hollow"></span>standing by</span>
+      </div>
+      <div class="ghost-rows"><i style="--w:64%"></i><i style="--w:47%"></i><i style="--w:58%"></i></div>
+    </div>
+  </section>
+  <h2 class="band-label"><span>Records</span></h2>
+  <section class="panel-slot is-ghost" data-panel="calendar" id="panel-calendar" aria-label="Applied calendar">
+    <div class="ghost panel">
+      <div class="ghost-head">
+        <span class="ghost-title">Applied calendar</span>
+        <span class="ghost-tag"><span class="dot dot-hollow"></span>standing by</span>
+      </div>
+      <div class="ghost-rows"><i style="--w:64%"></i><i style="--w:47%"></i><i style="--w:58%"></i></div>
+    </div>
+  </section>
+  <section class="panel-slot is-ghost" data-panel="platforms" id="panel-platforms" aria-label="Connected platforms">
+    <div class="ghost panel">
+      <div class="ghost-head">
+        <span class="ghost-title">Connected platforms</span>
+        <span class="ghost-tag"><span class="dot dot-hollow"></span>standing by</span>
+      </div>
+      <div class="ghost-rows"><i style="--w:66%"></i><i style="--w:48%"></i><i style="--w:58%"></i></div>
+    </div>
+  </section>
+
+  <section class="panel-slot is-ghost" data-panel="activity" id="panel-activity" aria-label="Mission log">
+    <div class="ghost panel">
+      <div class="ghost-head">
+        <span class="ghost-title">Mission log</span>
+        <span class="ghost-tag"><span class="dot dot-hollow"></span>standing by</span>
+      </div>
+      <div class="ghost-rows"><i style="--w:70%"></i><i style="--w:55%"></i><i style="--w:44%"></i></div>
+    </div>
+  </section>
+
+  <section class="panel-slot is-ghost" data-panel="career-path" id="panel-career-path" aria-label="The target">
+    <div class="ghost panel">
+      <div class="ghost-head">
+        <span class="ghost-title">The target</span>
+        <span class="ghost-tag"><span class="dot dot-hollow"></span>standing by</span>
+      </div>
+      <div class="ghost-rows"><i style="--w:62%"></i><i style="--w:46%"></i><i style="--w:68%"></i></div>
+    </div>
+  </section>
+  <section class="panel-slot" data-panel="drawer" id="panel-drawer" aria-label="Job details"></section>
+</main>
+
+<div class="save-notice" id="saveNotice" role="status" hidden>
+  <span class="dot dot-warn" aria-hidden="true"></span>
+  <p id="saveNoticeText"></p>
+  <button type="button" class="btn btn-ghost" id="saveNoticeClose">OK</button>
+</div>
+
+<footer class="cmc-footer">
+  <div class="footer-inner">
+    <div class="sample-banner" id="sampleBanner" hidden>
+      <span class="dot dot-warn" aria-hidden="true"></span>
+      <p>You are looking at sample data so you can see the board working.</p>
+      <div class="sample-actions">
+        <button type="button" class="btn btn-ghost" id="clearSamplesBtn">Clear sample data</button>
+        <span class="sample-confirm" id="clearConfirm" hidden>
+          <span>Clear every sample record?</span>
+          <button type="button" class="btn btn-danger" id="clearYesBtn">Yes, clear it</button>
+          <button type="button" class="btn btn-ghost" id="clearNoBtn">Keep it</button>
+        </span>
+      </div>
+    </div>
+    <p class="sync-line"><span>Career Ops Mission Control. Claude preps, Chris approves. Built by Claude.</span><span class="mono" id="lastSync" hidden></span></p>
+  </div>
+</footer>

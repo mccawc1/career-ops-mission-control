@@ -1,0 +1,101 @@
+/* ============================================================================
+   piece: know-you. "Get to know you": grouped question cards with a text
+   box and Save. Answered cards fold to one line. Empty collection = no panel.
+   ========================================================================== */
+.panel-slot[data-panel="know-you"]:empty { display: none; }
+.ky-panel { min-width: 0; }
+.ky-panel .panel-kicker { margin-left: auto; }
+.ky-body { display: grid; gap: 14px; }
+.ky-intro { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--muted); max-width: 70ch; }
+
+/* progress: one thin bar, one count. Numbers with context, no gauge. */
+.ky-progress { display: flex; align-items: center; gap: 10px; }
+.ky-track { flex: 1 1 auto; height: 6px; border-radius: 3px; background: var(--panel2); border: 1px solid var(--line); overflow: hidden; }
+.ky-bar { display: block; height: 100%; background: var(--good); border-radius: 3px; transition: width .25s ease; }
+.ky-progress-n { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+
+/* groups */
+.ky-group { display: grid; gap: 8px; }
+.ky-group-h { display: flex; align-items: baseline; gap: 10px; padding-top: 4px; }
+.ky-group-l {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ky-group-h::after { content: ""; flex: 1 1 auto; height: 1px; background: var(--line); align-self: center; }
+.ky-group-n { font-size: 11px; color: var(--faint); order: 3; }
+.ky-grid { display: grid; gap: 8px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 900px) {
+  .ky-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ky-card.is-closed { grid-column: 1 / -1; }
+}
+
+/* cards */
+.ky-card {
+  min-width: 0;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+}
+.ky-card.is-open { display: grid; gap: 6px; padding: 12px 14px 14px; }
+.ky-q { margin: 0; font-weight: 600; font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
+.ky-why { margin: 0 0 2px; font-size: 12.5px; line-height: 1.45; color: var(--muted); }
+.ky-field { margin-top: 2px; }
+.ky-box { min-height: 80px; background: var(--panel); }
+/* a card takes focus only as a hand-off while its controls are busy */
+.ky-card:focus { outline: none; }
+.ky-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ky-err { color: var(--bad); }
+.ky-actions { margin-top: 2px; }
+.ky-actions .btn-primary { min-width: 96px; }
+
+/* folded: dot, word, question, what happened, Edit */
+.ky-card.is-closed {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 8px 10px 8px 14px;
+  min-height: 56px;
+}
+.ky-card.is-closed .dot { margin-top: 1px; }
+.ky-closed-main { display: grid; gap: 2px; min-width: 0; }
+.ky-closed-top { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.ky-word { flex: none; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.ky-answered .ky-word, .ky-applied .ky-word { color: var(--good); }
+.ky-closed-q {
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.35;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ky-closed-sub {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ky-closed-sub.is-note { color: var(--faint); }
+.ky-applied { grid-template-columns: auto minmax(0, 1fr); }
+.ky-edit { min-width: 76px; }
+.ky-card.is-closed:hover .ky-edit { border-color: color-mix(in oklab, var(--accent), transparent 45%); color: var(--accent); }
+
+/* every question answered: one quiet line */
+.ky-done { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0; font-size: 13.5px; }
+.ky-done-ic { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; color: var(--good); background: color-mix(in oklab, var(--good), transparent 88%); }
+.ky-done .btn { margin-left: auto; }
+.ky-foot { display: flex; justify-content: flex-end; }
+
+@media (max-width: 480px) {
+  .ky-card.is-closed { grid-template-columns: auto minmax(0, 1fr); padding-right: 12px; }
+  .ky-applied { grid-template-columns: auto minmax(0, 1fr); }
+  .ky-edit { grid-column: 2; justify-self: start; }
+  .ky-done .btn { margin-left: 0; }
+}
